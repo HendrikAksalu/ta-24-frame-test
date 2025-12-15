@@ -2,7 +2,7 @@ import:
   - recipe/laravel.php
 
 config:
-  repository: 'git@github.com'
+  repository: 'git@github.com:HendrikAksalu/ta-24-frame-test.git'
   keep_releases: 2
 
 hosts:
