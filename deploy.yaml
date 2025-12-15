@@ -10,7 +10,7 @@ hosts:
     hostname: 'ta24aksalu.itmajakas.ee'
     http_user: virt137753
     remote_user: virt137753
-    deploy_path: '~/domeenid/www.ta24aksalu.itmajakas.ee/tvk'
+    deploy_path: '~/domeenid/www.ta24aksalu.itmajakas.ee/ta24'
 
 
 tasks:
