@@ -12,9 +12,13 @@ class CommentController extends Controller
     public function store(Request $request, Post $post)
     {
         $data = $request->validate([
-            'author_name' => 'required|string|max:255',
+            'author_name' => 'nullable|string|max:255',
             'content' => 'required|string',
         ]);
+
+        if (empty($data['author_name'])) {
+            $data['author_name'] = 'Test user';
+        }
 
         $post->comments()->create($data);
 

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Traits\HasFormatedDate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Post extends Model
 {
     use HasFactory;
+    use HasFormatedDate;
 
     protected $fillable = [
         'title',
@@ -21,34 +22,6 @@ class Post extends Model
         'created_at_formatted',
         'updated_at_formatted',
     ];
-
-
-    protected function createdAtFormated(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => $this->created_at?->diffForHumans()
-        );
-    }
-    protected function updatedAtFormated(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => $this->updated_at?->diffForHumans()
-        );
-    }
-
-    protected function createdAtFormatted(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => $this->created_at?->diffForHumans()
-        );
-    }
-
-    protected function updatedAtFormatted(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => $this->updated_at?->diffForHumans()
-        );
-    }
 
     public function author()
     {

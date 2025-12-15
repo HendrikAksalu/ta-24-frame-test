@@ -38,7 +38,7 @@ class PostController extends Controller
     public function show(Post $post)
     {
         return Inertia::render('posts/View', [
-            'post' => $post->load('author', 'comments'),
+            'post' => $post->loadMissing('author', 'comments'),
         ]);
     }
 

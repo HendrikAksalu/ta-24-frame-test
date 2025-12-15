@@ -118,9 +118,18 @@ const deleteComment = (commentId: number) => {
       <section class="rounded-xl border border-border/60 bg-background p-6 shadow-sm">
         <h2 class="mb-4 text-lg font-semibold text-foreground">Comments</h2>
 
+        <form @submit.prevent="submitComment" class="mb-6">
+          <div class="grid gap-3">
+            <textarea v-model="commentForm.content" rows="4" placeholder="Add a comment" class="w-full rounded border p-2"></textarea>
+            <div class="flex justify-end">
+              <Button type="submit" :disabled="commentForm.processing">Submit</Button>
+            </div>
+          </div>
+        </form>
+
         <div class="space-y-4">
           <div v-if="props.post.comments && props.post.comments.length">
-            <div v-for="comment in (props.post.comments || []).slice(0, 3)" :key="comment.id" class="border rounded p-3">
+            <div v-for="comment in props.post.comments" :key="comment.id" class="border rounded p-3">
               <div class="flex justify-between items-start">
                 <div>
                   <div class="text-sm font-medium">{{ comment.author_name }}</div>
@@ -134,23 +143,12 @@ const deleteComment = (commentId: number) => {
               </div>
               <div class="mt-2 text-sm whitespace-pre-line">{{ comment.content }}</div>
             </div>
-            <div v-if="(props.post.comments || []).length > 3" class="text-sm text-muted-foreground mt-2">
-              <a :href="show.url(props.post.id) + '#comments'">View all comments ({{ props.post.comments.length }})</a>
-            </div>
+            <!-- No 'View all comments' link needed when showing all comments -->
           </div>
           <div v-else class="text-sm text-muted-foreground">No comments yet.</div>
         </div>
-
-        <form @submit.prevent="submitComment" class="mt-6">
-          <div class="grid gap-3">
-            <input v-model="commentForm.author_name" placeholder="Your name" class="w-full rounded border p-2" />
-            <textarea v-model="commentForm.content" rows="4" placeholder="Add a comment" class="w-full rounded border p-2"></textarea>
-            <div class="flex justify-end">
-              <Button type="submit" :disabled="commentForm.processing">Add Comment</Button>
-            </div>
-          </div>
-        </form>
       </section>
     </div>
+    <!-- Debug comment list removed; only styled comments section remains -->
   </AppLayout>
 </template>
