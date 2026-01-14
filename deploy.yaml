@@ -25,7 +25,7 @@ tasks:
   deploy:
     - 'deploy:prepare'
     - 'deploy:vendors'
-    - 'npm:production'
+    # - 'npm:production'
     - 'artisan:storage:link'
     # - 'artisan:optimize:clear'
     # - 'artisan:optimize'
