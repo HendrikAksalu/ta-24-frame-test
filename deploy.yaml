@@ -11,6 +11,7 @@ hosts:
     http_user: virt137753
     remote_user: virt137753
     deploy_path: '~/domeenid/www.ta24aksalu.itmajakas.ee/ta24'
+    identity_file: '~/.ssh/id_ed25519'
 
 
 tasks:
