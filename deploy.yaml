@@ -1,39 +1,39 @@
-import: 
-  - recipe/laravel.php
+import:
+    - recipe/laravel.php
 
 config:
-  repository: 'git@github.com:HendrikAksalu/ta-24-frame-test.git'
-  keep_releases: 2
+    repository: 'git@github.com:HendrikAksalu/ta-24-frame-test.git'
+    keep_releases: 2
 
 hosts:
-  stage:
-    hostname: 'ta24aksalu.itmajakas.ee'
-    http_user: virt137753
-    remote_user: virt137753
-    deploy_path: '~/domeenid/www.ta24aksalu.itmajakas.ee/ta24'
-    identity_file: '~/.ssh/id_ed25519'
-
+    stage:
+        hostname: 'ta24aksalu.itmajakas.ee'
+        http_user: virt137753
+        remote_user: virt137753
+        deploy_path: '~/domeenid/www.ta24aksalu.itmajakas.ee/ta24'
+        identity_file: '~/.ssh/id_ed25519'
+        env:
+            GIT_SSH_COMMAND: 'ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new'
 
 tasks:
-  npm:production:
-  - run: 'cd {{release_path}} && npm ci'
-  - run: 'cd {{release_path}} && npx vite build'
+    npm:production:
+        - run: 'cd {{release_path}} && npm ci'
+        - run: 'cd {{release_path}} && npx vite build'
 
+    opcache:clear:
+        - run: killall php84-cgi || true
 
-  opcache:clear:
-    - run: killall php84-cgi || true
-
-  deploy:
-    - 'deploy:prepare'
-    - 'deploy:vendors'
-    # - 'npm:production'
-    - 'artisan:storage:link'
-    # - 'artisan:optimize:clear'
-    # - 'artisan:optimize'
-    - 'deploy:publish'
+    deploy:
+        - 'deploy:prepare'
+        - 'deploy:vendors'
+        # - 'npm:production'
+        - 'artisan:storage:link'
+        # - 'artisan:optimize:clear'
+        # - 'artisan:optimize'
+        - 'deploy:publish'
 
 after:
-  deploy:failed: deploy:unlock
+    deploy:failed: deploy:unlock
 
 before:
-  deploy:success: opcache:clear
+    deploy:success: opcache:clear
