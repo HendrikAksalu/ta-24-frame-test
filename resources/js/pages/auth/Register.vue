@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
-import { googleLogin, login } from '@/routes';
+import { login } from '@/routes';
 import { Form, Head } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 </script>
@@ -58,7 +58,7 @@ import { LoaderCircle } from 'lucide-vue-next';
                     <LoaderCircle v-if="processing" class="h-4 w-4 animate-spin" />
                     Create account
                 </Button>
-                <Button variant="secondary" as="a" :href="googleLogin()" type="button" class="mt-2 w-full" tabindex="5" :disabled="processing">
+                <Button variant="secondary" as="a" href="/auth/redirect" type="button" class="mt-2 w-full" tabindex="5" :disabled="processing">
                     <LoaderCircle v-if="processing" class="h-4 w-4 animate-spin" />
                     Sign in with Google
                 </Button>
