@@ -34,27 +34,24 @@ function searchCity() {
         <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
             <div class="grid auto-rows-min gap-4 md:grid-cols-3">
                 <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <form
-                        @submit.prevent="searchCity"
-                        class="absolute top-4 right-4 z-10 flex items-center gap-2 rounded bg-white/80 p-1 shadow dark:bg-black/40"
-                    >
-                        <div v-if="weather" class="flex h-full justify-between p-4">
-                        <div>
-                            <h2 class="text-5xl font-semibold">{{ weather.main.temp }}°C</h2>
-                            <ul class="mt-4 grid list-inside list-disc gap-1 text-muted-foreground">
-                                <li>{{ weather.weather[0].description }}</li>
-                                <li>Humidity: {{ weather.main.humidity }}%</li>
-                                <li>Wind: {{ weather.wind.speed }} m/s</li>
-                            </ul>
+                    <div class="flex h-full flex-col justify-between p-4">
+                        <div v-if="weather" class="flex flex-row justify-between">
+                            <div>
+                                <h2 class="text-5xl font-semibold">{{ weather.main.temp }}°C</h2>
+                                <ul class="mt-4 grid list-inside list-disc gap-1 text-muted-foreground">
+                                    <li>{{ weather.weather[0].description }}</li>
+                                    <li>Humidity: {{ weather.main.humidity }}%</li>
+                                    <li>Wind: {{ weather.wind.speed }} m/s</li>
+                                </ul>
+                            </div>
+                            <img class="size-20" :src="`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`" alt="" />
                         </div>
-                        <img class="size-20" :src="`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`" alt="" />
+                        <div v-else class="flex h-full items-center justify-center text-muted-foreground">Weather data unavailable</div>
+                        <form @submit.prevent="searchCity" class="mt-4 flex items-center gap-2">
+                            <input v-model="cityInput" type="text" placeholder="Enter city (e.g. Tallinn)" class="rounded border px-2 py-1" />
+                            <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-white">Search</button>
+                        </form>
                     </div>
-                    <div v-else class="flex h-full items-center justify-center p-4 text-muted-foreground">Weather data unavailable</div>
-                            <form @submit.prevent="searchCity" class="mt-4 flex items-center gap-2">
-                                <input v-model="cityInput" type="text" placeholder="Enter city (e.g. Tallinn)" class="rounded border px-2 py-1" />
-                                <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-white">Search</button>
-                            </form>
-                </div>
                 <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                     <PlaceholderPattern />
                 </div>
