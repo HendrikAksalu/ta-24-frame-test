@@ -13,9 +13,18 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-defineProps<{
+const props = defineProps<{
     weather: WeatherData | null;
+    city: string;
 }>();
+
+import { router } from '@inertiajs/vue3';
+import { ref } from 'vue';
+const cityInput = ref(props.city);
+
+function searchCity() {
+    router.get('/dashboard', { city: cityInput.value });
+}
 </script>
 
 <template>
@@ -23,6 +32,10 @@ defineProps<{
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <form @submit.prevent="searchCity" class="mb-4 flex items-center gap-2">
+                <input v-model="cityInput" type="text" placeholder="Enter city (e.g. Tallinn)" class="rounded border px-2 py-1" />
+                <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-white">Search</button>
+            </form>
             <div class="grid auto-rows-min gap-4 md:grid-cols-3">
                 <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                     <div v-if="weather" class="flex h-full justify-between p-4">

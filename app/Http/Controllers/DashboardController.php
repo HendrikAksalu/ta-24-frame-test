@@ -15,23 +15,23 @@ class DashboardController extends Controller
     public function __invoke(Request $request)
     {
 
-        $value = Cache::remember('weather', now()->addHour(), function () {
+        $city = $request->query('city', 'Kuressaare');
+        $cacheKey = 'weather_' . strtolower($city);
+        $value = Cache::remember($cacheKey, now()->addHour(), function () use ($city) {
             $response = Http::get('https://api.openweathermap.org/data/2.5/weather', [
-                'q' => 'Kuressaare',
+                'q' => $city,
                 'appid' => config('services.weather.key'),
                 'units' => 'metric',
             ]);
-
             if ($response->failed()) {
                 return null;
             }
-
             return $response->json();
         });
 
-
         return Inertia::render('Dashboard', [
             'weather' => $value,
+            'city' => $city,
         ]);
     }
 }
