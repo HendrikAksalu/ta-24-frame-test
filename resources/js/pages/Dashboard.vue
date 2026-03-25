@@ -56,6 +56,7 @@ function searchCity() {
                             <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-white">Search</button>
                         </form>
                     </div>
+                </div>
                 <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                     <PlaceholderPattern />
                 </div>
