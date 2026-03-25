@@ -35,7 +35,7 @@ function searchCity() {
             <div class="grid auto-rows-min gap-4 md:grid-cols-3">
                 <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                     <div class="flex h-full flex-col justify-between p-4">
-                        <div class="flex-1 flex flex-row justify-between">
+                        <div class="flex flex-1 flex-row justify-between">
                             <div>
                                 <template v-if="weather">
                                     <h2 class="text-5xl font-semibold">{{ weather.main.temp }}°C</h2>
