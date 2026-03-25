@@ -8,6 +8,8 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class Timetable extends Mailable
 {
@@ -16,8 +18,11 @@ class Timetable extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
-    {
+    public function __construct(
+        protected Collection $timetableEvents,
+        protected Carbon $startDate,
+        protected Carbon $endDate,
+    ) {
         //
     }
 
@@ -37,7 +42,12 @@ class Timetable extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            markdown: 'emails.timetable',
+            with: [
+                'timetableEvents' => $this->timetableEvents,
+                'startDate' => $this->startDate,
+                'endDate' => $this->endDate,
+            ],
         );
     }
 

@@ -22,6 +22,10 @@ class DashboardController extends Controller
                 'units' => 'metric',
             ]);
 
+            if ($response->failed()) {
+                return null;
+            }
+
             return $response->json();
         });
 
