@@ -55,13 +55,12 @@ function searchCity() {
                             <input v-model="cityInput" type="text" placeholder="Enter city (e.g. Tallinn)" class="rounded border px-2 py-1" />
                             <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-white">Search</button>
                         </form>
-                        <div class="mt-3">
-                            <a href="/posts" class="inline-flex rounded bg-slate-700 px-3 py-1 text-white">Ava blogi</a>
-                        </div>
                     </div>
                 </div>
                 <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
+                    <div class="flex h-full items-center justify-center p-4">
+                        <a href="/posts" class="inline-flex rounded bg-slate-700 px-4 py-2 text-white">Ava blogi</a>
+                    </div>
                 </div>
                 <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                     <PlaceholderPattern />
