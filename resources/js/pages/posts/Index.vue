@@ -67,7 +67,7 @@ type User = {
 export type Post = {
   id: number;
   title: string;
-  content: string;
+  description: string;
   author_id: string;
   published: boolean;
   created_at: string;

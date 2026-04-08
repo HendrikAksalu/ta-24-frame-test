@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
 
         // Call other seeders
         $this->call([
-            // PostSeeder::class,
+            PostSeeder::class,
             AuthorSeeder::class,
             CommentSeeder::class,
             ProductSeeder::class,

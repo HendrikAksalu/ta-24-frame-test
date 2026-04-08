@@ -21,7 +21,7 @@ const props = defineProps<{ authors: Record<number, string> }>();
 
 const form = useForm({
     title: '',
-    content: '',
+    description: '',
     author_id: '',
     published: false,
 });
@@ -47,9 +47,9 @@ const submit = () => {
                             <InputError :message="form.errors.title" />
                         </div>
                         <div>
-                            <Label for="content">Content</Label>
-                            <Textarea class="mt-1" name="content" v-model="form.content" />
-                            <InputError :message="form.errors.content" />
+                            <Label for="description">Description</Label>
+                            <Textarea class="mt-1" name="description" v-model="form.description" />
+                            <InputError :message="form.errors.description" />
                         </div>
                         <div>
                             <Label for="author">Author</Label>

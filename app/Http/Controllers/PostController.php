@@ -26,17 +26,25 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
-        Post::create($request->validate([
+        $data = $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
+            'description' => 'required|string',
             'author_id' => 'required|exists:authors,id',
             'published' => 'boolean',
-        ]));
+        ]);
+
+        $data['content'] = $data['description'];
+
+        Post::create($data);
         return redirect()->route('posts.index');
     }
 
     public function show(Post $post)
     {
+        if (empty($post->description) && !empty($post->content)) {
+            $post->description = $post->content;
+        }
+
         return Inertia::render('posts/View', [
             'post' => $post->loadMissing('author', 'comments'),
         ]);
@@ -44,6 +52,10 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
+        if (empty($post->description) && !empty($post->content)) {
+            $post->description = $post->content;
+        }
+
         return Inertia::render('posts/Edit', [
             'post' => $post,
             'authors' => Author::all()->mapWithKeys(fn($author) => [$author->id => $author->first_name . ' ' . $author->last_name])->toArray(),
@@ -52,12 +64,16 @@ class PostController extends Controller
 
     public function update(Request $request, Post $post)
     {
-        $post->update($request->validate([
+        $data = $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
+            'description' => 'required|string',
             'author_id' => 'required|exists:authors,id',
             'published' => 'boolean',
-        ]));
+        ]);
+
+        $data['content'] = $data['description'];
+
+        $post->update($data);
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
     }
 

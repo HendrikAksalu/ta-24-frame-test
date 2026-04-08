@@ -14,7 +14,7 @@ const props = defineProps<{
     post: {
         id: number;
         title: string;
-        content: string;
+        description: string;
         author_id: number | null;
         published: boolean;
         created_at?: string;
@@ -30,7 +30,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const form = useForm({
     title: props.post.title,
-    content: props.post.content,
+    description: props.post.description,
     author_id: props.post.author_id ?? '',
     published: props.post.published,
 });
@@ -60,10 +60,10 @@ const submit = () => {
                 </div>
 
                 <div>
-                    <Label for="content">Content</Label>
-                    <Textarea id="content" rows="6" v-model="form.content" />
-                    <p v-if="form.errors.content" class="text-red-600 text-sm">
-                        {{ form.errors.content }}
+                    <Label for="description">Description</Label>
+                    <Textarea id="description" rows="6" v-model="form.description" />
+                    <p v-if="form.errors.description" class="text-red-600 text-sm">
+                        {{ form.errors.description }}
                     </p>
                 </div>
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import Button from '@/components/ui/button/Button.vue';
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import { edit, index, show } from '@/routes/posts';
 import type { BreadcrumbItem } from '@/types';
@@ -10,7 +10,7 @@ const props = defineProps<{
   post: {
     id: number;
     title: string;
-    content: string;
+    description: string;
     author?: { id?: number; first_name: string; last_name: string } | null;
     published: boolean;
     created_at: string;
@@ -53,6 +53,9 @@ const deleteComment = (commentId: number) => {
     onError: (err: any) => console.error(err),
   });
 };
+
+const page = usePage();
+const isAdmin = computed(() => page.props.auth?.user?.email === 'test@example.com');
 </script>
 
 <template>
@@ -111,7 +114,7 @@ const deleteComment = (commentId: number) => {
       <section class="rounded-xl border border-border/60 bg-background p-6 shadow-sm">
         <h2 class="mb-4 text-lg font-semibold text-foreground">Content</h2>
         <div class="prose max-w-none text-sm leading-relaxed text-foreground/90 dark:prose-invert">
-          <p class="whitespace-pre-line">{{ props.post.content }}</p>
+          <p class="whitespace-pre-line">{{ props.post.description }}</p>
         </div>
       </section>
 
@@ -135,7 +138,7 @@ const deleteComment = (commentId: number) => {
                   <div class="text-sm font-medium">{{ comment.author_name }}</div>
                   <div class="text-xs text-muted-foreground">{{ new Date(comment.created_at).toLocaleString() }}</div>
                 </div>
-                <div>
+                <div v-if="isAdmin">
                   <Button size="icon" variant="ghost" @click="() => deleteComment(comment.id)">
                     Delete
                   </Button>

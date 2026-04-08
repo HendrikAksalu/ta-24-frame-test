@@ -28,6 +28,8 @@ class CommentController extends Controller
     /** Delete a comment */
     public function destroy(Post $post, Comment $comment)
     {
+        abort_unless(auth()->user()?->email === 'test@example.com', 403);
+
         if ($comment->post_id !== $post->id) {
             abort(404);
         }
