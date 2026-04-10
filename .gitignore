@@ -25,3 +25,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Local deploy SSH keys
+github_deploy
+github_deploy.pub
