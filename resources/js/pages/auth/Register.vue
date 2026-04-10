@@ -7,8 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
+import { login as googleOAuth } from '@/routes/google';
 import { Form, Head } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+
+defineProps<{
+    error?: string;
+}>();
 </script>
 
 <template>
@@ -21,6 +26,10 @@ import { LoaderCircle } from 'lucide-vue-next';
             v-slot="{ errors, processing }"
             class="flex flex-col gap-6"
         >
+            <div v-if="error" class="text-center text-sm font-medium text-destructive">
+                {{ error }}
+            </div>
+
             <div class="grid gap-6">
                 <div class="grid gap-2">
                     <Label for="name">Name</Label>
@@ -58,7 +67,7 @@ import { LoaderCircle } from 'lucide-vue-next';
                     <LoaderCircle v-if="processing" class="h-4 w-4 animate-spin" />
                     Create account
                 </Button>
-                <Button variant="secondary" as="a" href="/auth/redirect" type="button" class="mt-2 w-full" tabindex="5" :disabled="processing">
+                <Button variant="secondary" as="a" :href="googleOAuth.url()" type="button" class="mt-2 w-full" tabindex="5" :disabled="processing">
                     <LoaderCircle v-if="processing" class="h-4 w-4 animate-spin" />
                     Sign in with Google
                 </Button>

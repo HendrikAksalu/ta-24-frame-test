@@ -17,7 +17,7 @@ class CommentController extends Controller
         ]);
 
         if (empty($data['author_name'])) {
-            $data['author_name'] = 'Test user';
+            $data['author_name'] = auth()->user()?->name ?? 'Test User';
         }
 
         $post->comments()->create($data);

@@ -12,7 +12,7 @@ import InputError from '@/components/InputError.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Posts create',
+        title: 'Create Post',
         href: create().url,
     },
 ];
@@ -38,7 +38,7 @@ const submit = () => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
             <div class="max-w-2xl h-full mx-auto w-full">
-                <h3 class="text-lg font-medium">Post Create</h3>
+                <h3 class="text-lg font-medium">Create Post</h3>
                 <form @submit.prevent="submit">
                     <div class="grid gap-4 mt-6">
                         <div>
@@ -70,7 +70,6 @@ const submit = () => {
                     </div>
                 </form>
 
-                <pre>{{ form }}</pre>
             </div>
         </div>
     </AppLayout>

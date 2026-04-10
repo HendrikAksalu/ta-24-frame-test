@@ -8,12 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { register } from '@/routes';
+import { login as googleOAuth } from '@/routes/google';
 import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 
 defineProps<{
     status?: string;
+    error?: string;
     canResetPassword: boolean;
 }>();
 </script>
@@ -24,6 +26,10 @@ defineProps<{
 
         <div v-if="status" class="mb-4 text-center text-sm font-medium text-green-600">
             {{ status }}
+        </div>
+
+        <div v-if="error" class="mb-4 text-center text-sm font-medium text-destructive">
+            {{ error }}
         </div>
 
         <Form
@@ -76,7 +82,7 @@ defineProps<{
                     <LoaderCircle v-if="processing" class="h-4 w-4 animate-spin" />
                     Log in
                 </Button>
-                <Button variant="secondary" as="a" href="/auth/redirect" type="button" class="mt-2 w-full" :tabindex="5" :disabled="processing">
+                <Button variant="secondary" as="a" :href="googleOAuth.url()" type="button" class="mt-2 w-full" :tabindex="5" :disabled="processing">
                     <LoaderCircle v-if="processing" class="h-4 w-4 animate-spin" />
                     Sign in with Google
                 </Button>

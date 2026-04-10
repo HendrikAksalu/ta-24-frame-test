@@ -112,7 +112,7 @@ const isAdmin = computed(() => page.props.auth?.user?.email === 'test@example.co
       </div>
 
       <section class="rounded-xl border border-border/60 bg-background p-6 shadow-sm">
-        <h2 class="mb-4 text-lg font-semibold text-foreground">Content</h2>
+        <h2 class="mb-4 text-lg font-semibold text-foreground">Description</h2>
         <div class="prose max-w-none text-sm leading-relaxed text-foreground/90 dark:prose-invert">
           <p class="whitespace-pre-line">{{ props.post.description }}</p>
         </div>
