@@ -2,22 +2,34 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Comment;
+use App\Models\Post;
+use Illuminate\Database\Seeder;
 
 class CommentSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Adds a couple of comments per post that still have none (idempotent).
      */
     public function run(): void
     {
-        // Create 3 comments for each post
-        $posts = \App\Models\Post::all();
-        foreach ($posts as $post) {
-            \App\Models\Comment::factory(3)->create([
-                'post_id' => $post->id,
-            ]);
+        $samples = [
+            ['author_name' => 'Lugeja', 'content' => 'Tänu hea ülevaate eest!'],
+            ['author_name' => 'Mari', 'content' => 'Kas saaksid järgmises postituses koodi näidet lisada?'],
+        ];
+
+        foreach (Post::query()->cursor() as $post) {
+            if ($post->comments()->exists()) {
+                continue;
+            }
+
+            foreach ($samples as $sample) {
+                Comment::query()->create([
+                    'post_id' => $post->id,
+                    'author_name' => $sample['author_name'],
+                    'content' => $sample['content'],
+                ]);
+            }
         }
     }
 }

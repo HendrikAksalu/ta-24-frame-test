@@ -4,8 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Author;
 use App\Models\Comment;
-use App\Models\Post;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,9 +18,12 @@ class PostFactory extends Factory
      */
     public function definition(): array
     {
+        $body = $this->faker->paragraphs(3, true);
+
         return [
-            'title' => $this->faker->sentence,
-            'content' => $this->faker->text(),
+            'title' => $this->faker->sentence(),
+            'description' => $body,
+            'content' => $body,
             'author_id' => Author::factory(),
             'published' => $this->faker->boolean(),
         ];

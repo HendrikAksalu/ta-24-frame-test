@@ -21,10 +21,10 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('test@test.ee'),
         ]);
 
-        // Call other seeders
+        // Blog first (authors → posts → comments), then demo catalog data
         $this->call([
-            PostSeeder::class,
             AuthorSeeder::class,
+            PostSeeder::class,
             CommentSeeder::class,
             ProductSeeder::class,
             ReviewSeeder::class,
