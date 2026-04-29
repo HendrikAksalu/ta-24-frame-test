@@ -4,7 +4,6 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import { WeatherData, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import PlaceholderPattern from '../components/PlaceholderPattern.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -63,7 +62,16 @@ function searchCity() {
                     </div>
                 </div>
                 <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
+                    <div class="flex h-full flex-col justify-between p-4">
+                        <div>
+                            <h2 class="text-sm font-semibold">E-pood ja NFL</h2>
+                            <p class="mt-2 text-xs text-muted-foreground">Vaata tooteid ja lisa rookied.</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="/shop" class="inline-flex flex-1 items-center justify-center rounded bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700">E-pood</a>
+                            <a href="/nfl-rookies" class="inline-flex flex-1 items-center justify-center rounded bg-slate-700 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800">NFL rookied</a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">

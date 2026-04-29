@@ -19,6 +19,7 @@ class ProductFactory extends Factory
         return [
             'name' => $this->faker->words(3, true),
             'description' => $this->faker->paragraph(),
+            'image' => 'https://placehold.co/600x400/png?text=' . urlencode($this->faker->words(2, true)),
             'price' => $this->faker->randomFloat(2, 1, 1000),
             'sku' => strtoupper($this->faker->unique()->bothify('SKU-#####')),
             'stock_quantity' => $this->faker->numberBetween(0, 100),

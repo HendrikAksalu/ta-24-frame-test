@@ -15,11 +15,13 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Create a specific test user
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => Hash::make('test@test.ee'),
-        ]);
+        User::updateOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => Hash::make('test@test.ee'),
+            ],
+        );
 
         // Blog first (authors → posts → comments), then demo catalog data
         $this->call([
@@ -28,6 +30,7 @@ class DatabaseSeeder extends Seeder
             CommentSeeder::class,
             ProductSeeder::class,
             ReviewSeeder::class,
+            NflRookieSeeder::class,
         ]);
     }
 }

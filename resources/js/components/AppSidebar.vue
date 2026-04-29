@@ -25,6 +25,16 @@ const mainNavItems: NavItem[] = [
         href: '/posts',
         icon: FileText,
     },
+    {
+        title: 'E-pood',
+        href: '/shop',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'NFL rookied',
+        href: '/nfl-rookies',
+        icon: FileText,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

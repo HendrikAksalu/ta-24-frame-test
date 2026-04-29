@@ -4,6 +4,9 @@ use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ShopController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\MarkerController;
 use App\Http\Controllers\PostController;
 use App\Mail\Timetable;
@@ -34,6 +37,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Nested resource for comments under posts
     Route::resource('posts.comments', CommentController::class)->only(['store', 'destroy']);
 });
+
+// Shop/cart/checkout (Stripe)
+Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update/{product}', [CartController::class, 'update'])->name('cart.update');
+Route::post('/cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
+Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/checkout/stripe', [CheckoutController::class, 'stripeCheckout'])->name('checkout.stripe');
+Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
+
+// NFL rookies UI (list via JSON API)
+Route::get('/nfl-rookies', function () {
+    return Inertia::render('nfl-rookies/Index');
+})->name('nfl.rookies.index');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 require __DIR__.'/posts.php';
