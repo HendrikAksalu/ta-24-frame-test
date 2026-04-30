@@ -112,7 +112,10 @@ function clearCart() {
                 <div class="text-xl font-semibold">{{ total.toFixed(2) }} €</div>
             </div>
 
-            <div class="flex justify-end">
+            <div class="flex justify-end gap-3">
+                <a href="/shop" class="rounded-md border border-border/80 bg-card px-4 py-2 text-sm hover:bg-muted/30">
+                    Tagasi e-poodi
+                </a>
                 <a href="/checkout" class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
                     Edasi maksma
                 </a>
