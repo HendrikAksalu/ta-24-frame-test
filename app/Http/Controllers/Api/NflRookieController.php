@@ -18,6 +18,7 @@ class NflRookieController extends Controller
             'director' => ['nullable', 'string', 'max:255'],
             'position' => ['nullable', 'string', 'max:255'],
             'genre' => ['nullable', 'string', 'max:255'],
+            'draft_round' => ['nullable', 'integer', 'min:1', 'max:7'],
             'sort_by' => ['nullable', 'string', 'max:32'],
             'sort' => ['nullable', 'string', 'max:32'],
             'direction' => ['nullable', 'string', 'in:asc,desc'],
@@ -54,6 +55,7 @@ class NflRookieController extends Controller
             'search' => $validated['search'] ?? null,
             'team' => $teamFilter,
             'position' => $positionFilter,
+            'draft_round' => $validated['draft_round'] ?? null,
             'sort_by' => $sortBy,
             'direction' => $direction,
             'limit' => $limit,
@@ -75,6 +77,10 @@ class NflRookieController extends Controller
 
             if (! empty($positionFilter)) {
                 $query->where('position', $positionFilter);
+            }
+
+            if (! empty($validated['draft_round'])) {
+                $query->where('draft_round', $validated['draft_round']);
             }
 
             return $query->orderBy($sortBy, $direction)->limit($limit)->get();
