@@ -11,7 +11,7 @@
 - **Autentimine:** Laravel Vue starter kit (Inertia — sisselogimine, registreerumine, Google OAuth valikuliselt)
 - **Kaart:** Leaflet + OpenStreetMap
 - **Ilma API:** OpenWeatherMap (`WEATHER_API` → `config/services.php`)
-- **Makse:** Stripe (valikuline) + PayPal demo (simuleeritud serveripoolne voog)
+- **Makse:** PayPal demo (simuleeritud serveripoolne voog)
 
 ### Rakenduse ülesehitus
 
