@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import { dashboard } from '@/routes';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
 import { Form, Head, Link, usePage } from '@inertiajs/vue3';
@@ -23,7 +24,11 @@ defineProps<Props>();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
-        title: 'Profile settings',
+        title: 'Töölaud',
+        href: dashboard().url,
+    },
+    {
+        title: 'Profiil',
         href: edit().url,
     },
 ];
@@ -34,15 +39,15 @@ const user = page.props.auth.user;
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head title="Profile settings" />
+        <Head title="Profiil — sätted" />
 
         <SettingsLayout>
             <div class="flex flex-col space-y-6">
-                <HeadingSmall title="Profile information" description="Update your name and email address" />
+                <HeadingSmall title="Profiiliandmed" description="Uuenda oma nime ja e-posti aadressi." />
 
                 <Form v-bind="ProfileController.update.form()" class="space-y-6" v-slot="{ errors, processing, recentlySuccessful }">
                     <div class="grid gap-2">
-                        <Label for="name">Name</Label>
+                        <Label for="name">Nimi</Label>
                         <Input
                             id="name"
                             class="mt-1 block w-full"
@@ -50,13 +55,13 @@ const user = page.props.auth.user;
                             :default-value="user.name"
                             required
                             autocomplete="name"
-                            placeholder="Full name"
+                            placeholder="Sinu nimi"
                         />
                         <InputError class="mt-2" :message="errors.name" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="email">Email address</Label>
+                        <Label for="email">E-post</Label>
                         <Input
                             id="email"
                             type="email"
@@ -65,30 +70,30 @@ const user = page.props.auth.user;
                             :default-value="user.email"
                             required
                             autocomplete="username"
-                            placeholder="Email address"
+                            placeholder="sinu@epost.ee"
                         />
                         <InputError class="mt-2" :message="errors.email" />
                     </div>
 
                     <div v-if="mustVerifyEmail && !user.email_verified_at">
                         <p class="-mt-4 text-sm text-muted-foreground">
-                            Your email address is unverified.
+                            Sinu e-post pole veel kinnitat.
                             <Link
                                 :href="send()"
                                 as="button"
                                 class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                             >
-                                Click here to resend the verification email.
+                                Klõpsa siia, et kinnituskiri uuesti saata.
                             </Link>
                         </p>
 
                         <div v-if="status === 'verification-link-sent'" class="mt-2 text-sm font-medium text-green-600">
-                            A new verification link has been sent to your email address.
+                            Uus kinnituslink saadeti sinu e-postile.
                         </div>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <Button :disabled="processing">Save</Button>
+                        <Button :disabled="processing">Salvesta</Button>
 
                         <Transition
                             enter-active-class="transition ease-in-out"
@@ -96,7 +101,7 @@ const user = page.props.auth.user;
                             leave-active-class="transition ease-in-out"
                             leave-to-class="opacity-0"
                         >
-                            <p v-show="recentlySuccessful" class="text-sm text-neutral-600">Saved.</p>
+                            <p v-show="recentlySuccessful" class="text-sm text-neutral-600">Salvestatud.</p>
                         </Transition>
                     </div>
                 </Form>

@@ -15,16 +15,36 @@ class NflRookieController extends Controller
         $validated = $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
             'team' => ['nullable', 'string', 'max:255'],
+            'director' => ['nullable', 'string', 'max:255'],
             'position' => ['nullable', 'string', 'max:255'],
-            'sort_by' => ['nullable', 'string', 'in:title,team,position,draft_round,season_year'],
+            'genre' => ['nullable', 'string', 'max:255'],
+            'sort_by' => ['nullable', 'string', 'max:32'],
+            'sort' => ['nullable', 'string', 'max:32'],
             'direction' => ['nullable', 'string', 'in:asc,desc'],
             'limit' => ['nullable', 'integer', 'min:1', 'max:100'],
             'season_year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
+            'year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
         ]);
 
-        $seasonYear = $validated['season_year'] ?? now()->year;
-        $sortBy = $validated['sort_by'] ?? 'draft_round';
-        $direction = $validated['direction'] ?? 'asc';
+        $teamFilter = $validated['team'] ?? $validated['director'] ?? null;
+        $positionFilter = $validated['position'] ?? $validated['genre'] ?? null;
+        $seasonYear = $validated['season_year'] ?? $validated['year'] ?? (int) now()->year;
+
+        $sortInput = $validated['sort_by'] ?? $validated['sort'] ?? 'created_at';
+        $sortAliases = [
+            'release_year' => 'season_year',
+            'director' => 'team',
+            'genre' => 'position',
+            'rating' => 'draft_round',
+        ];
+        $sortBy = $sortAliases[$sortInput] ?? $sortInput;
+
+        $allowedSorts = ['title', 'team', 'position', 'draft_round', 'season_year', 'created_at'];
+        if (! in_array($sortBy, $allowedSorts, true)) {
+            $sortBy = 'created_at';
+        }
+
+        $direction = $validated['direction'] ?? ($sortBy === 'created_at' ? 'desc' : 'asc');
         $limit = $validated['limit'] ?? 20;
 
         $cacheVersionKey = 'nfl_rookies_cache_version';
@@ -32,8 +52,8 @@ class NflRookieController extends Controller
 
         $params = [
             'search' => $validated['search'] ?? null,
-            'team' => $validated['team'] ?? null,
-            'position' => $validated['position'] ?? null,
+            'team' => $teamFilter,
+            'position' => $positionFilter,
             'sort_by' => $sortBy,
             'direction' => $direction,
             'limit' => $limit,
@@ -42,28 +62,32 @@ class NflRookieController extends Controller
         $hash = md5(json_encode($params, JSON_UNESCAPED_SLASHES));
         $cacheKey = "nfl_rookies:list:v{$cacheVersion}:{$hash}";
 
-        $subjects = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($validated, $seasonYear, $sortBy, $direction, $limit) {
+        $subjects = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($validated, $seasonYear, $sortBy, $direction, $limit, $teamFilter, $positionFilter) {
             $query = MyFavoriteSubject::query()->where('season_year', $seasonYear);
 
-            if (!empty($validated['search'])) {
-                $query->where('title', 'like', '%' . $validated['search'] . '%');
+            if (! empty($validated['search'])) {
+                $query->where('title', 'like', '%'.$validated['search'].'%');
             }
 
-            if (!empty($validated['team'])) {
-                $query->where('team', $validated['team']);
+            if (! empty($teamFilter)) {
+                $query->where('team', 'like', '%'.$teamFilter.'%');
             }
 
-            if (!empty($validated['position'])) {
-                $query->where('position', $validated['position']);
+            if (! empty($positionFilter)) {
+                $query->where('position', $positionFilter);
             }
 
             return $query->orderBy($sortBy, $direction)->limit($limit)->get();
         });
 
+        $data = $subjects->map(fn (MyFavoriteSubject $s) => array_merge($s->toArray(), [
+            'rating' => $this->formatRating($s),
+        ]))->values();
+
         return response()->json([
             'success' => true,
-            'count' => $subjects->count(),
-            'data' => $subjects,
+            'count' => $data->count(),
+            'data' => $data,
         ]);
     }
 
@@ -73,7 +97,9 @@ class NflRookieController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $subject,
+            'data' => array_merge($subject->toArray(), [
+                'rating' => $this->formatRating($subject),
+            ]),
         ]);
     }
 
@@ -94,7 +120,9 @@ class NflRookieController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $subject,
+            'data' => array_merge($subject->toArray(), [
+                'rating' => $this->formatRating($subject),
+            ]),
         ], 201);
     }
 
@@ -115,9 +143,13 @@ class NflRookieController extends Controller
         $subject->update($validated);
         $this->bumpCacheVersion();
 
+        $fresh = $subject->fresh();
+
         return response()->json([
             'success' => true,
-            'data' => $subject->fresh(),
+            'data' => array_merge($fresh->toArray(), [
+                'rating' => $this->formatRating($fresh),
+            ]),
         ]);
     }
 
@@ -130,6 +162,13 @@ class NflRookieController extends Controller
         return response()->json(null, 204);
     }
 
+    private function formatRating(MyFavoriteSubject $subject): string
+    {
+        $v = 9.2 - ($subject->draft_round - 1) * 0.42;
+
+        return number_format(max(6.0, min(9.9, $v)), 1);
+    }
+
     private function bumpCacheVersion(): void
     {
         $cacheVersionKey = 'nfl_rookies_cache_version';
@@ -138,4 +177,3 @@ class NflRookieController extends Controller
         Cache::put($cacheVersionKey, $current + 1, now()->addDays(30));
     }
 }
-

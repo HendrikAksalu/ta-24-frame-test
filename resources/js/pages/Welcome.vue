@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import AppLogo from '@/components/AppLogo.vue';
 import { dashboard, login, register } from '@/routes';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+const page = usePage();
+const logoHref = computed(() => (page.props.auth?.user ? dashboard().url : '/'));
 </script>
 
 <template>
@@ -9,21 +14,20 @@ import { Head, Link } from '@inertiajs/vue3';
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     </Head>
     <div class="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#0a0a0a]">
-        <header class="mb-6 w-full max-w-[335px] text-sm not-has-[nav]:hidden lg:max-w-4xl">
-            <nav class="flex items-center justify-end gap-4">
-                <Link
-                    href="/blog"
-                    class="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
-                >
-                    Blogi
-                </Link>
-                <Link
-                    v-if="$page.props.auth.user"
-                    :href="dashboard()"
-                    class="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-                >
-                    Dashboard
-                </Link>
+        <header class="mb-6 flex w-full max-w-[335px] items-center gap-4 text-sm not-has-[nav]:hidden lg:max-w-4xl">
+            <Link :href="logoHref" class="inline-flex min-w-0 shrink-0 items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 rounded-md">
+                <AppLogo />
+                <span class="sr-only">Avaleht</span>
+            </Link>
+            <nav class="ml-auto flex flex-wrap items-center justify-end gap-4">
+                <template v-if="$page.props.auth.user">
+                    <Link
+                        :href="dashboard()"
+                        class="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                    >
+                        Dashboard
+                    </Link>
+                </template>
                 <template v-else>
                     <Link
                         :href="login()"

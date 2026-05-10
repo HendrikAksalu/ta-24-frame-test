@@ -20,6 +20,7 @@ class Order extends Model
         'paid_at',
         'stripe_checkout_session_id',
         'stripe_payment_intent_id',
+        'paypal_transaction_id',
     ];
 
     protected $casts = [
@@ -32,4 +33,3 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 }
-

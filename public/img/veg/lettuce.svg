@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="480" viewBox="0 0 600 480" role="img" aria-label="Salatilehed">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ecfdf5"/>
+      <stop offset="100%" stop-color="#bbf7d0"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="480" fill="url(#bg)"/>
+  <g fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round">
+    <path d="M300 380 C260 280 240 160 300 90 C360 160 340 280 300 380Z" fill="#4ade80" opacity=".95"/>
+    <path d="M260 360 C230 260 210 140 260 85 C285 130 295 240 260 360Z" fill="#22c55e"/>
+    <path d="M340 360 C370 260 395 145 340 85 C315 125 305 245 340 360Z" fill="#16a34a"/>
+    <path d="M285 115 Q320 55 355 125"/>
+    <path d="M245 140 Q275 70 305 135"/>
+    <path d="M318 140 Q348 75 378 142"/>
+  </g>
+</svg>

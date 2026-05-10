@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import AuthLayout from '@/layouts/auth/AuthSimpleLayout.vue';
+import AuthGateLayout from '@/layouts/auth/AuthGateLayout.vue';
 
-defineProps<{
-    title?: string;
-    description?: string;
-}>();
+withDefaults(
+    defineProps<{
+        title?: string;
+        description?: string;
+        showHeader?: boolean;
+    }>(),
+    {
+        showHeader: true,
+    },
+);
 </script>
 
 <template>
-    <AuthLayout :title="title" :description="description">
+    <AuthGateLayout :title="title" :description="description" :show-header="showHeader">
         <slot />
-    </AuthLayout>
+    </AuthGateLayout>
 </template>

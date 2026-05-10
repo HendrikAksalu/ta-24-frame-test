@@ -17,13 +17,6 @@ class PostController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        return Inertia::render('posts/Create', [
-            'authors' => Author::all()->mapWithKeys(fn($author) => [$author->id => $author->first_name . ' ' . $author->last_name])->toArray(),
-        ]);
-    }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -36,12 +29,13 @@ class PostController extends Controller
         $data['content'] = $data['description'];
 
         Post::create($data);
+
         return redirect()->route('posts.index');
     }
 
     public function show(Post $post)
     {
-        if (empty($post->description) && !empty($post->content)) {
+        if (empty($post->description) && ! empty($post->content)) {
             $post->description = $post->content;
         }
 
@@ -52,13 +46,13 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
-        if (empty($post->description) && !empty($post->content)) {
+        if (empty($post->description) && ! empty($post->content)) {
             $post->description = $post->content;
         }
 
         return Inertia::render('posts/Edit', [
             'post' => $post,
-            'authors' => Author::all()->mapWithKeys(fn($author) => [$author->id => $author->first_name . ' ' . $author->last_name])->toArray(),
+            'authors' => Author::all()->mapWithKeys(fn ($author) => [$author->id => $author->first_name.' '.$author->last_name])->toArray(),
         ]);
     }
 
@@ -74,6 +68,7 @@ class PostController extends Controller
         $data['content'] = $data['description'];
 
         $post->update($data);
+
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
     }
 

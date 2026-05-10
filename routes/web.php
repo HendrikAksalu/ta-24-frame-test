@@ -1,14 +1,13 @@
 <?php
 
-use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BlogController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MarkerController;
-use App\Http\Controllers\PostController;
+use App\Http\Controllers\ShopController;
+use App\Http\Controllers\WeatherController;
 use App\Mail\Timetable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
@@ -21,24 +20,35 @@ Route::get('/', function () {
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{post}', [BlogController::class, 'show'])->name('blog.show');
+
+// Varasem Laravel starter /posts voog → avalik NFL blogi (eemaldab inglisekeelse loendi/loomise UI).
+Route::redirect('/posts', '/blog', 302)->name('posts.index');
 Route::post('/blog/{post}/comments', [CommentController::class, 'store'])
     ->middleware('throttle:30,1')
     ->name('blog.comments.store');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', DashboardController::class)->name('dashboard');
-    Route::get('markers', [MarkerController::class, 'index'])->name('markers.index');
-    Route::post('markers', [MarkerController::class, 'store'])->name('markers.store');
-    Route::get('markers/{marker}', [MarkerController::class, 'show'])->name('markers.show');
-    Route::put('markers/{marker}', [MarkerController::class, 'update'])->name('markers.update');
-    Route::delete('markers/{marker}', [MarkerController::class, 'destroy'])->name('markers.destroy');
-    Route::resource('posts', PostController::class);
-    Route::resource('authors', AuthorController::class);
-    // Nested resource for comments under posts
-    Route::resource('posts.comments', CommentController::class)->only(['store', 'destroy']);
+// Kaart: kõik näevad; lisamine/muutmine ainult sisse loginud (POST/PUT/DELETE allpool).
+Route::get('kaart', function () {
+    return Inertia::render('Kaart');
+})->name('kaart');
+Route::get('markers', [MarkerController::class, 'index'])->name('markers.index');
+Route::get('markers/{marker}', [MarkerController::class, 'show'])->name('markers.show');
+
+// Blogisse postitamine: piisab auth-st (verified võib ülesande keskkonnas blokeerida).
+Route::middleware(['auth'])->group(function () {
+    Route::get('/blog-create', [BlogController::class, 'create'])->name('blog.create');
+    Route::post('/blog', [BlogController::class, 'store'])->middleware('throttle:30,1')->name('blog.store');
 });
 
-// Shop/cart/checkout (Stripe)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::get('ilm', WeatherController::class)->name('ilm');
+    Route::post('markers', [MarkerController::class, 'store'])->name('markers.store');
+    Route::put('markers/{marker}', [MarkerController::class, 'update'])->name('markers.update');
+    Route::delete('markers/{marker}', [MarkerController::class, 'destroy'])->name('markers.destroy');
+});
+
+// Shop / ostukorv / kassa (Stripe + PayPal demo)
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
@@ -47,8 +57,10 @@ Route::post('/cart/remove/{product}', [CartController::class, 'remove'])->name('
 Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/checkout/paypal', [CheckoutController::class, 'paypalCheckout'])->name('checkout.paypal');
 Route::post('/checkout/stripe', [CheckoutController::class, 'stripeCheckout'])->name('checkout.stripe');
 Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/checkout/pay', [CheckoutController::class, 'success'])->name('checkout.pay');
 Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
 
 // NFL rookies UI (list via JSON API)

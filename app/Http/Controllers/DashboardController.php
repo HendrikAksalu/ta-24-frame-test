@@ -3,35 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Dashboard hub: links to main modules (weather, map, blog, shop, etc.).
      */
     public function __invoke(Request $request)
     {
-
-        $city = $request->query('city', 'Kuressaare');
-        $cacheKey = 'weather_' . strtolower($city);
-        $value = Cache::remember($cacheKey, now()->addHour(), function () use ($city) {
-            $response = Http::get('https://api.openweathermap.org/data/2.5/weather', [
-                'q' => $city,
-                'appid' => config('services.weather.key'),
-                'units' => 'metric',
-            ]);
-            if ($response->failed()) {
-                return null;
-            }
-            return $response->json();
-        });
-
-        return Inertia::render('Dashboard', [
-            'weather' => $value,
-            'city' => $city,
-        ]);
+        return Inertia::render('Dashboard');
     }
 }

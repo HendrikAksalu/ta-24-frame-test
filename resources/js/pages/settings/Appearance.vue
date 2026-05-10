@@ -8,10 +8,15 @@ import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { appearance } from '@/routes';
+import { dashboard } from '@/routes';
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
-        title: 'Appearance settings',
+        title: 'Töölaud',
+        href: dashboard().url,
+    },
+    {
+        title: 'Välimus',
         href: appearance().url,
     },
 ];
@@ -19,11 +24,11 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head title="Appearance settings" />
+        <Head title="Välimus — sätted" />
 
         <SettingsLayout>
             <div class="space-y-6">
-                <HeadingSmall title="Appearance settings" description="Update your account's appearance settings" />
+                <HeadingSmall title="Välimus" description="Vali kas hele, tume või süsteemi järgi automaatne kujundus." />
                 <AppearanceTabs />
             </div>
         </SettingsLayout>

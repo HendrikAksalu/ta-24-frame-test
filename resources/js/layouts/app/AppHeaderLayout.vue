@@ -14,9 +14,9 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <AppShell class="flex-col">
+    <AppShell variant="header" class="flex-col bg-muted/30">
         <AppHeader :breadcrumbs="breadcrumbs" />
-        <AppContent>
+        <AppContent class="flex-1 px-4 pb-8 pt-4 md:px-6">
             <slot />
         </AppContent>
     </AppShell>

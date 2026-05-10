@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import BlogLayout from '@/layouts/BlogLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { Button } from '@/components/ui/button';
+import { create as blogCreate } from '@/routes/blog';
+import { login } from '@/routes';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Plus } from 'lucide-vue-next';
 
 interface PostRow {
     id: number;
@@ -18,53 +22,82 @@ interface Paginated {
     next_page_url: string | null;
 }
 
+const page = usePage();
+
 defineProps<{
     posts: Paginated;
 }>();
 </script>
 
 <template>
-    <Head title="Blogi" />
+    <Head title="NFL blogi" />
 
-    <BlogLayout>
-        <h1 class="mb-2 text-3xl font-semibold tracking-tight">Blogi</h1>
-        <p class="mb-8 text-muted-foreground">Avaldatud postitused. Sisu pärineb andmebaasist (sh seederid).</p>
+    <AppLayout :breadcrumbs="[]">
+        <div class="mx-auto w-full max-w-3xl flex-1 px-4 py-6 md:px-6 md:py-8">
+            <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <h1 class="text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">NFL blogi</h1>
+                    <p class="mt-2 max-w-xl text-neutral-600 dark:text-neutral-400">
+                        Lühikesed artiklid National Football League’i, mängude ja fantasy näpunäidete teemal.
+                    </p>
+                </div>
+                <Button v-if="page.props.auth?.user" as-child class="shrink-0 gap-2">
+                    <Link :href="blogCreate().url">
+                        <Plus class="size-4" />
+                        Uus postitus
+                    </Link>
+                </Button>
+            </div>
 
-        <ul v-if="posts.data.length" class="space-y-6">
-            <li v-for="post in posts.data" :key="post.id" class="rounded-xl border border-border/80 bg-card p-5 shadow-sm">
-                <Link :href="`/blog/${post.id}`" class="text-xl font-medium text-foreground underline-offset-4 hover:underline">
-                    {{ post.title }}
-                </Link>
-                <p class="mt-1 text-sm text-muted-foreground">
-                    {{ post.author ? `${post.author.first_name} ${post.author.last_name}` : 'Autor teadmata' }}
-                    · {{ post.created_at_formatted }}
-                </p>
-                <p class="mt-3 line-clamp-3 text-sm leading-relaxed text-foreground/90">
-                    {{ post.description || '—' }}
-                </p>
-                <Link :href="`/blog/${post.id}`" class="mt-3 inline-block text-sm font-medium text-primary hover:underline"> Loe edasi </Link>
-            </li>
-        </ul>
-        <p v-else class="text-muted-foreground">Ühtegi avaldatud postitust pole. Lisa neid sisse logides jaotises Posts või käivita <code class="rounded bg-muted px-1 py-0.5 text-xs">php artisan db:seed</code>.</p>
+            <ul v-if="posts.data.length" class="space-y-6">
+                <li v-for="post in posts.data" :key="post.id" class="rounded-xl border border-neutral-200/90 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+                    <Link :href="`/blog/${post.id}`" class="text-xl font-medium text-foreground underline-offset-4 hover:underline">
+                        {{ post.title }}
+                    </Link>
+                    <p class="mt-1 text-sm text-muted-foreground">
+                        {{ post.author ? `${post.author.first_name} ${post.author.last_name}` : 'Autor teadmata' }}
+                        · {{ post.created_at_formatted }}
+                    </p>
+                    <p class="mt-3 line-clamp-3 text-sm leading-relaxed text-foreground/90">
+                        {{ post.description || '—' }}
+                    </p>
+                    <Link :href="`/blog/${post.id}`" class="mt-3 inline-block text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+                        Loe edasi
+                    </Link>
+                </li>
+            </ul>
+            <p v-else class="text-muted-foreground">
+                Ühtegi avaldatud postitust pole. Loo esimene lehel „Uus postitus“ (/blog-create) või laadi NFL näidised käsuga
+                <code class="rounded bg-muted px-1 py-0.5 text-xs">php artisan db:seed --class=NflBlogReseedSeeder</code>
+                .
+            </p>
 
-        <div v-if="posts.last_page > 1" class="mt-10 flex justify-between gap-4 text-sm">
-            <component
-                :is="posts.prev_page_url ? Link : 'span'"
-                :href="posts.prev_page_url || undefined"
-                class="rounded-md border border-border px-4 py-2"
-                :class="!posts.prev_page_url && 'pointer-events-none opacity-40'"
-            >
-                Eelmine
-            </component>
-            <span class="self-center text-muted-foreground"> Lehekülg {{ posts.current_page }} / {{ posts.last_page }} </span>
-            <component
-                :is="posts.next_page_url ? Link : 'span'"
-                :href="posts.next_page_url || undefined"
-                class="rounded-md border border-border px-4 py-2"
-                :class="!posts.next_page_url && 'pointer-events-none opacity-40'"
-            >
-                Järgmine
-            </component>
+            <div v-if="posts.last_page > 1" class="mt-10 flex justify-between gap-4 text-sm">
+                <component
+                    :is="posts.prev_page_url ? Link : 'span'"
+                    :href="posts.prev_page_url || undefined"
+                    class="rounded-md border border-border px-4 py-2"
+                    :class="!posts.prev_page_url && 'pointer-events-none opacity-40'"
+                >
+                    Eelmine
+                </component>
+                <span class="self-center text-muted-foreground"> Lehekülg {{ posts.current_page }} / {{ posts.last_page }} </span>
+                <component
+                    :is="posts.next_page_url ? Link : 'span'"
+                    :href="posts.next_page_url || undefined"
+                    class="rounded-md border border-border px-4 py-2"
+                    :class="!posts.next_page_url && 'pointer-events-none opacity-40'"
+                >
+                    Järgmine
+                </component>
+            </div>
+
+            <p v-if="!page.props.auth?.user" class="mt-10 text-sm text-muted-foreground">
+                Postitamiseks
+                <Link :href="login().url" class="font-medium text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400">logi sisse</Link>
+                ja ava
+                <Link :href="blogCreate().url" class="font-medium text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400">/blog-create</Link>.
+            </p>
         </div>
-    </BlogLayout>
+    </AppLayout>
 </template>

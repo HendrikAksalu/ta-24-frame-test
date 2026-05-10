@@ -2,9 +2,12 @@
     "private": true,
     "type": "module",
     "scripts": {
+        "wayfinder": "php artisan wayfinder:generate",
+        "prebuild": "php artisan wayfinder:generate",
         "build": "vite build",
+        "build:sqlite": "DB_CONNECTION=sqlite vite build",
         "build:ssr": "vite build && vite build --ssr",
-        "dev": "concurrently \"php artisan serve\" \"vite\" -n server,vite -c blue,green",
+        "dev": "concurrently \"php artisan serve --host=127.0.0.1 --port=8001\" \"vite\" -n server,vite -c blue,green",
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix"

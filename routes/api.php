@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\FriendFavoriteSubjectsController;
 use App\Http\Controllers\Api\NflRookieController;
 use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/friend-favorite-subjects', FriendFavoriteSubjectsController::class);
 
 Route::get('/nfl-rookies', [NflRookieController::class, 'index']);
 Route::get('/nfl-rookies/{id}', [NflRookieController::class, 'show']);
@@ -14,4 +17,3 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle']);
-

@@ -24,4 +24,18 @@ export default defineConfig({
             },
         }),
     ],
+    // `php artisan serve` @ 127.0.0.1:8001 + brauser samast hostist → HMR peab sama hosti kasutama
+    server: {
+        host: '127.0.0.1',
+        port: 5173,
+        strictPort: true,
+        hmr: {
+            host: '127.0.0.1',
+            protocol: 'ws',
+            clientPort: 5173,
+        },
+        watch: {
+            ignored: ['**/storage/framework/views/**'],
+        },
+    },
 });
