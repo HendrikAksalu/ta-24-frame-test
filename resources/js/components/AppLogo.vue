@@ -4,7 +4,13 @@ import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const page = usePage();
-const appName = computed(() => (page.props.name as string) || 'Ülesanded');
+const appName = computed(() => {
+    const raw = String((page.props.name as string | undefined) ?? '').trim();
+    if (raw === '' || raw === 'Laravel') {
+        return 'Ülesanded';
+    }
+    return raw;
+});
 </script>
 
 <template>
