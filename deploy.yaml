@@ -24,11 +24,19 @@ tasks:
     opcache:clear:
         - run: killall php84-cgi || true
 
+    # Demo/PWA keskkond: blog+pood+NFL — prod näitab sama mis kohalik migrate --seed.
+    # NB: NflBlogReseedSeeder kustutab kõik postitused ja kommentaarid.
+    demo:seed:
+        - run: 'cd {{release_path}} && php artisan db:seed --class=NflBlogReseedSeeder --force'
+        - run: 'cd {{release_path}} && php artisan db:seed --class=ProductSeeder --force'
+        - run: 'cd {{release_path}} && php artisan db:seed --class=NflRookieSeeder --force'
+
     deploy:
         - 'deploy:prepare'
         - 'deploy:vendors'
         - 'npm:production'
         - 'artisan:migrate'
+        - 'demo:seed'
         - 'artisan:storage:link'
         - 'artisan:optimize:clear'
         - 'artisan:optimize'
