@@ -3,32 +3,37 @@
 ## Projekti dokumentatsioon
 
 ### Kasutatud tehnoloogiad
-- **Backend:** Laravel 11 (PHP 8.2+)
+
+- **Backend:** Laravel 12 (PHP 8.2+)
 - **Frontend:** Vue 3 + Inertia.js
-- **CSS:** Tailwind CSS 3
+- **CSS:** Tailwind CSS 4
 - **Andmebaas:** SQLite (arenduses)
-- **Autentimine:** Laravel Breeze
+- **Autentimine:** Laravel Vue starter kit (Inertia — sisselogimine, registreerumine, Google OAuth valikuliselt)
 - **Kaart:** Leaflet + OpenStreetMap
-- **Ilma API:** OpenWeatherMap API
-- **Makse:** PayPal (simuleeritud)
+- **Ilma API:** OpenWeatherMap (`WEATHER_API` → `config/services.php`)
+- **Makse:** Stripe (valikuline) + PayPal demo (simuleeritud serveripoolne voog)
 
 ### Rakenduse ülesehitus
-Projekt on üles ehitatud Laravel + Inertia.js + Vue 3 arhitektuuriga. Kõik viis ülesannet on integreeritud ühte rakendusse.
+
+Projekt on üles ehitatud Laravel + Inertia.js + Vue 3 arhitektuuriga. Moodulid (ilm, kaart, blog, e-pood, NFL rookied / API demo jms) on ühes rakenduses.
 
 **Kaustad:**
-- `app/Models/` — Eloquent mudelid (User, Post, Comment, Marker, Product, Order, OrderItem, Movie)
-- `app/Http/Controllers/` — Kontrollerid igale funktsionaalsusele
-- `app/Http/Controllers/Api/` — JSON API kontrollerid
-- `database/migrations/` — Andmebaasi migratsioonid
-- `resources/js/Pages/` — Vue leheküljed (Weather, Map, Blog, Shop, Movies)
-- `routes/web.php` — Veebimaršruudid
+
+- `app/Models/` — Eloquent mudelid (nt User, Post, Comment, Author, Marker, Product, Order, OrderItem, Review, MyFavoriteSubject — NFL rookied / API kirjed)
+- `app/Http/Controllers/` — veebikontrollerid
+- `app/Http/Controllers/Api/` — JSON API (nt rookied, sõbra API proxy)
+- `database/migrations/` — migratsioonid
+- `database/seeders/` — näidisandmed (blog, pood, rookied)
+- `resources/js/pages/` — Vue leheküljed (nt `Ilm.vue`, `Kaart.vue`, `blog/`, `shop/`, `nfl-rookies/`, `cart/`, `checkout/`)
+- `routes/web.php` — veebimaršruudid
+- `routes/api.php` — API maršruudid
 
 ### Juhised koodi käivitamiseks
 
 ```bash
 # 1. Klooni repositoorium
 git clone <repo-url>
-cd Hajusrakendused
+cd ta-24-frame-test
 
 # 2. Paigalda PHP sõltuvused
 composer install
@@ -48,17 +53,35 @@ touch database/database.sqlite
 # 7. Käivita migratsioonid
 php artisan migrate
 
-# 8. Täida andmebaas algandmetega (tooted)
+# 8. Täida andmebaas näidisandmetega
 php artisan db:seed
 
-# 9. Loo storage link (piltide jaoks)
+# 9. Loo storage link (failide jaoks)
 php artisan storage:link
 
 # 10. Lisa OpenWeatherMap API võti .env faili
 # Registreeru: https://openweathermap.org/api
-# Lisa: OPENWEATHERMAP_API_KEY=sinu_api_võti
+# Lisa (vt config/services.php → weather.key):
+WEATHER_API=sinu_api_võti
 
 # 11. Käivita arendusserverid
+npm run dev
+```
+
+See käsk käivitab korraga PHP development serveri ja Vite (vaikimisi umbes `http://127.0.0.1:8001`; täpne port on `package.json` → skript `dev`).
+
+Alternatiiv (käsitsi kaks terminali):
+
+```bash
 php artisan serve
 npm run dev
 ```
+
+### Tootmine / build
+
+```bash
+touch database/database.sqlite && php artisan migrate --force
+npm run build
+```
+
+`npm run build` käivitab Wayfinderi ja Vite production buildi.
