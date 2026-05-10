@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { Star, User, Users } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
 
@@ -17,9 +17,6 @@ type NflRookie = {
     season_year: number;
     rating?: string;
 };
-
-const page = usePage();
-const user = computed(() => page.props.auth?.user);
 
 function csrf(): string {
     return document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '';
