@@ -97,7 +97,14 @@ class NflRookieSeeder extends Seeder
         ];
 
         foreach ($entries as $entry) {
-            MyFavoriteSubject::query()->create($entry);
+            MyFavoriteSubject::query()->updateOrCreate(
+                [
+                    'title' => $entry['title'],
+                    'team' => $entry['team'],
+                    'season_year' => $entry['season_year'],
+                ],
+                $entry,
+            );
         }
     }
 }
