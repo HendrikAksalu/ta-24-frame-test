@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { create as blogCreate } from '@/routes/blog';
 import { login } from '@/routes';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
 
 interface PostRow {
@@ -27,6 +27,13 @@ const page = usePage();
 defineProps<{
     posts: Paginated;
 }>();
+
+function deletePost(id: number, title: string) {
+    if (!confirm(`Kustuta postitus „${title}“?`)) {
+        return;
+    }
+    router.delete(`/blog/${id}`);
+}
 </script>
 
 <template>
@@ -61,9 +68,19 @@ defineProps<{
                     <p class="mt-3 line-clamp-3 text-sm leading-relaxed text-foreground/90">
                         {{ post.description || '—' }}
                     </p>
-                    <Link :href="`/blog/${post.id}`" class="mt-3 inline-block text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">
-                        Loe edasi
-                    </Link>
+                    <div class="mt-3 flex flex-wrap items-center gap-3">
+                        <Link :href="`/blog/${post.id}`" class="text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+                            Loe edasi
+                        </Link>
+                        <button
+                            v-if="page.props.auth?.user"
+                            type="button"
+                            class="text-sm font-medium text-red-600 hover:underline dark:text-red-400"
+                            @click.prevent="deletePost(post.id, post.title)"
+                        >
+                            Kustuta
+                        </button>
+                    </div>
                 </li>
             </ul>
             <p v-else class="text-muted-foreground">

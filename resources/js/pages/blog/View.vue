@@ -37,10 +37,19 @@ const deleteComment = (commentId: number) => {
     if (!confirm('Kustuta see kommentaar?')) {
         return;
     }
-    router.delete(`/posts/${props.post.id}/comments/${commentId}`, {
+    router.delete(`/blog/${props.post.id}/comments/${commentId}`, {
         preserveScroll: true,
     });
 };
+
+function deletePost() {
+    if (!confirm('Kustuta see postitus koos kommentaaridega?')) {
+        return;
+    }
+    router.delete(`/blog/${props.post.id}`, {
+        preserveScroll: true,
+    });
+}
 </script>
 
 <template>
@@ -59,6 +68,16 @@ const deleteComment = (commentId: number) => {
                 </p>
                 <div class="prose prose-sm mt-6 max-w-none whitespace-pre-line text-foreground dark:prose-invert">
                     {{ post.description }}
+                </div>
+                <div v-if="user" class="mt-8 border-t border-neutral-200 pt-6 dark:border-neutral-700">
+                    <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        @click="deletePost"
+                    >
+                        Kustuta postitus
+                    </Button>
                 </div>
             </article>
 

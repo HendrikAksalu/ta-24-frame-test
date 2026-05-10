@@ -27,6 +27,10 @@ Route::post('/blog/{post}/comments', [CommentController::class, 'store'])
     ->middleware('throttle:30,1')
     ->name('blog.comments.store');
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::delete('/blog/{post}/comments/{comment}', [CommentController::class, 'destroy'])->name('blog.comments.destroy');
+});
+
 // Kaart: kõik näevad; lisamine/muutmine ainult sisse loginud (POST/PUT/DELETE allpool).
 Route::get('kaart', function () {
     return Inertia::render('Kaart');
@@ -38,6 +42,7 @@ Route::get('markers/{marker}', [MarkerController::class, 'show'])->name('markers
 Route::middleware(['auth'])->group(function () {
     Route::get('/blog-create', [BlogController::class, 'create'])->name('blog.create');
     Route::post('/blog', [BlogController::class, 'store'])->middleware('throttle:30,1')->name('blog.store');
+    Route::delete('/blog/{post}', [BlogController::class, 'destroy'])->name('blog.destroy');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

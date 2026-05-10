@@ -49,16 +49,17 @@ function addToCart(productId: number) {
 }
 
 function imageUrl(image: string | null) {
-    if (!image) {
+    if (!image || !String(image).trim()) {
         return '/img/veg/tomato.jpg';
     }
-    if (image.startsWith('/')) {
-        return image;
+    const s = String(image).trim();
+    if (s.startsWith('http://') || s.startsWith('https://')) {
+        return s;
     }
-    if (image.startsWith('http://') || image.startsWith('https://')) {
-        return image;
+    if (s.startsWith('/')) {
+        return s;
     }
-    return image;
+    return `/${s.replace(/^\/+/, '')}`;
 }
 
 function priceNum(price: number | string) {
