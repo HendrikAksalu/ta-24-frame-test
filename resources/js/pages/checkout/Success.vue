@@ -26,9 +26,6 @@ const props = defineProps<{
 }>();
 
 const methodLabel = computed(() => {
-    if (props.order.payment_provider === 'paypal') {
-        return 'PayPal (demo)';
-    }
     if (props.order.payment_provider === 'stripe') {
         return 'Stripe';
     }

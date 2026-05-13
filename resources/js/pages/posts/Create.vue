@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { create as blogCreate } from '@/routes/blog';
 import { store } from '@/routes/posts';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/vue3';
@@ -14,7 +13,7 @@ import InputError from '@/components/InputError.vue';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Create Post',
-        href: blogCreate().url,
+        href: '/blog-create',
     },
 ];
 

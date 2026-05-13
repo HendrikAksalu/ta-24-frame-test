@@ -45,9 +45,14 @@ let map: L.Map | null = null;
 let markersLayer: L.LayerGroup | null = null;
 let suppressNextMapClick = false;
 
-function csrf(): string {
+/** Meta token on first paint; prop updates on every Inertia visit (avoids stale token after login/regenerate). */
+const csrfHeader = computed(() => {
+    const fromProps = page.props.csrf_token;
+    if (typeof fromProps === 'string' && fromProps.length > 0) {
+        return fromProps;
+    }
     return document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '';
-}
+});
 
 function formatApiError(data: Record<string, unknown>): string {
     if (typeof data.message === 'string') {
@@ -65,7 +70,7 @@ function formatApiError(data: Record<string, unknown>): string {
 async function api<T>(url: string, options: RequestInit = {}): Promise<T> {
     const headers: Record<string, string> = {
         Accept: 'application/json',
-        'X-CSRF-TOKEN': csrf(),
+        'X-CSRF-TOKEN': csrfHeader.value,
         'X-Requested-With': 'XMLHttpRequest',
         ...(options.headers as Record<string, string>),
     };
@@ -268,11 +273,8 @@ onBeforeUnmount(() => {
                     :key="m.id"
                     class="rounded-md border border-border/80 p-2 transition hover:bg-muted/40"
                 >
-                    <div class="font-medium leading-snug">{{ m.name }}</div>
-                    <p
-                        class="mt-1.5 text-sm leading-snug text-neutral-700 dark:text-neutral-300"
-                        :class="{ 'italic text-muted-foreground': !m.description?.trim() }"
-                    >
+                    <div class="font-medium">{{ m.name }}</div>
+                    <p class="mt-1 text-xs leading-snug text-muted-foreground">
                         {{ m.description?.trim() ? m.description : 'Kirjeldus puudub.' }}
                     </p>
                     <div class="mt-1 text-xs text-muted-foreground">

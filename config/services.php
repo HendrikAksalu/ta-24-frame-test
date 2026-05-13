@@ -44,14 +44,6 @@ return [
         'currency' => env('STRIPE_CURRENCY', 'eur'),
     ],
 
-    /*
-    | PayPal: demo keskkonnas kasutatakse serveripoolset simulatsiooni (nagu RalfiHarjutus).
-    | Tootmises asenda päris REST API (Orders v2 + OAuth) ja CAPTURE tagasisidega.
-    */
-    'paypal' => [
-        'simulate_failure' => filter_var(env('PAYPAL_SIMULATE_FAILURE', false), FILTER_VALIDATE_BOOLEAN),
-    ],
-
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

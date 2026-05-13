@@ -13,6 +13,7 @@ type CartItem = {
 
 const props = defineProps<{
     cart: CartItem[];
+    stripeConfigured: boolean;
 }>();
 
 const form = useForm({
@@ -33,8 +34,8 @@ function imageUrl(image: string | null) {
     return image;
 }
 
-function submitPayPal() {
-    form.post('/checkout/paypal');
+function submitStripe() {
+    form.post('/checkout/stripe');
 }
 </script>
 
@@ -105,13 +106,20 @@ function submitPayPal() {
                             </div>
                         </div>
 
+                        <p
+                            v-if="!props.stripeConfigured"
+                            class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100"
+                        >
+                            Stripe makselahenduse kasutamiseks lisa keskkonda <code class="rounded bg-amber-100/80 px-1 dark:bg-amber-900/60">STRIPE_SECRET_KEY</code>.
+                        </p>
+
                         <button
                             type="button"
-                            class="mt-6 w-full rounded-lg bg-[#0070ba] py-3 text-sm font-semibold text-white transition hover:bg-[#005ea6] disabled:opacity-50"
-                            :disabled="form.processing"
-                            @click="submitPayPal()"
+                            class="mt-6 w-full rounded-lg bg-[#635BFF] py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#544bc9] disabled:opacity-50"
+                            :disabled="form.processing || !props.stripeConfigured"
+                            @click="submitStripe()"
                         >
-                            Maksa PayPaliga
+                            Maksa kaardiga (Stripe)
                         </button>
                     </div>
 

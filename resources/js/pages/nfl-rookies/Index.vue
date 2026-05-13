@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import { Star, User, Users } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
 
@@ -18,14 +18,20 @@ type NflRookie = {
     rating?: string;
 };
 
-function csrf(): string {
+const page = usePage();
+
+const csrfHeader = computed(() => {
+    const fromProps = page.props.csrf_token;
+    if (typeof fromProps === 'string' && fromProps.length > 0) {
+        return fromProps;
+    }
     return document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '';
-}
+});
 
 async function api<T>(url: string, options: RequestInit = {}): Promise<T> {
     const headers: Record<string, string> = {
         Accept: 'application/json',
-        'X-CSRF-TOKEN': csrf(),
+        'X-CSRF-TOKEN': csrfHeader.value,
         ...(options.headers as Record<string, string>),
     };
 
@@ -113,7 +119,8 @@ const searchPlaceholder = computed(() =>
     source.value === 'friend' ? 'Otsi pealkirja järgi...' : 'Otsi nime järgi...',
 );
 
-/** Õppe ülesandes kasutatav sõbra avalik endpoint — sama näidata kui päris päringu allikat */
+const activeApiPath = computed(() => (source.value === 'mine' ? '/api/nfl-rookies' : '/api/friend-favorite-subjects'));
+
 const friendPublicApiUrl = 'https://raamistikud.ta24armus.itmajakas.ee/api/my-favorite-subjects';
 
 function buildMineQuery(): string {
@@ -124,7 +131,7 @@ function buildMineQuery(): string {
     if (genre.value !== 'Kõik') {
         params.set('position', genre.value);
     }
-    params.set('sort', sortField.value);
+    params.set('sort_by', sortField.value);
     params.set('direction', direction.value);
     params.set('limit', String(limit.value));
     params.set('season_year', String(seasonYear.value));
@@ -145,102 +152,16 @@ function buildFriendQuery(): string {
     return params.toString();
 }
 
-/** Sõbra avaliku API (`my-favorite-subjects`) rida → sama kaardivorming mis proxy normeeris */
-function normalizeFriendSubjectRow(row: Record<string, unknown>, idx: number): NflRookie {
-    const rawId = row.id;
-    const fid = rawId !== undefined && rawId !== null ? rawId : idx + 1;
-    const idStr = `friend-${fid}`;
-
-    const hasMovieShape = row.director !== undefined || row.release_year !== undefined;
-
-    if (hasMovieShape) {
-        const ratingRaw = row.rating;
-        let ratingNum: number | null = null;
-        if (typeof ratingRaw === 'number' && !Number.isNaN(ratingRaw)) {
-            ratingNum = ratingRaw;
-        } else if (typeof ratingRaw === 'string' && ratingRaw !== '' && !Number.isNaN(Number(ratingRaw))) {
-            ratingNum = Number(ratingRaw);
-        }
-
-        let ratingStr: string;
-        if (ratingNum !== null) {
-            ratingStr = ratingNum.toFixed(1);
-        } else if (ratingRaw !== undefined && ratingRaw !== null && String(ratingRaw) !== '') {
-            ratingStr = String(ratingRaw);
-        } else {
-            ratingStr = (7.4 + (idx % 6) * 0.15).toFixed(1);
-        }
-
-        const ry = row.release_year;
-        const seasonYearVal = typeof ry === 'number' ? ry : new Date().getFullYear();
-
-        const draftRound =
-            typeof row.draft_round === 'number'
-                ? row.draft_round
-                : ratingNum !== null
-                  ? Math.max(1, Math.min(7, Math.round(12 - ratingNum)))
-                  : 3;
-
-        return {
-            id: idStr,
-            title: String(row.title ?? ''),
-            team: String(row.director ?? ''),
-            position: String(row.genre ?? ''),
-            season_year: seasonYearVal,
-            draft_round: draftRound,
-            image: typeof row.image === 'string' ? row.image : null,
-            description: String(row.description ?? ''),
-            rating: ratingStr,
-        };
-    }
-
-    const draftRound = typeof row.draft_round === 'number' ? row.draft_round : 4;
-    const ratingRaw = row.rating;
-    let ratingStr: string;
-    if (ratingRaw !== undefined && ratingRaw !== null && String(ratingRaw) !== '') {
-        ratingStr = typeof ratingRaw === 'number' ? ratingRaw.toFixed(1) : String(ratingRaw);
-    } else {
-        ratingStr = Math.max(6.0, Math.min(9.9, 9.2 - (draftRound - 1) * 0.42)).toFixed(1);
-    }
-
-    const sy = row.season_year;
-    return {
-        id: idStr,
-        title: String(row.title ?? ''),
-        team: String(row.team ?? ''),
-        position: String(row.position ?? ''),
-        season_year: typeof sy === 'number' ? sy : new Date().getFullYear(),
-        draft_round: draftRound,
-        image: typeof row.image === 'string' ? row.image : null,
-        description: String(row.description ?? ''),
-        rating: ratingStr,
-    };
-}
-
 async function load() {
     loading.value = true;
     error.value = null;
 
     try {
-        if (source.value === 'mine') {
-            const endpoint = `/api/rookies?${buildMineQuery()}`;
-            const res = await api<{ success: boolean; data: NflRookie[]; message?: string }>(endpoint);
-            subjects.value = Array.isArray(res.data) ? res.data : [];
-            if (res.success === false && subjects.value.length === 0) {
-                error.value = 'Andmeid ei laaditud.';
-            }
-        } else {
-            const url = `${friendPublicApiUrl}?${buildFriendQuery()}`;
-            const res = await fetch(url, { headers: { Accept: 'application/json' } });
-            const payload = (await res.json().catch(() => ({}))) as { data?: unknown; message?: string };
-            if (!res.ok) {
-                throw new Error(typeof payload.message === 'string' ? payload.message : 'Sõbra API vastust ei saadud.');
-            }
-            const rows = payload.data;
-            const list = Array.isArray(rows) ? rows : [];
-            subjects.value = list.map((r, i) =>
-                normalizeFriendSubjectRow(r !== null && typeof r === 'object' ? (r as Record<string, unknown>) : {}, i),
-            );
+        const endpoint = source.value === 'mine' ? `/api/nfl-rookies?${buildMineQuery()}` : `/api/friend-favorite-subjects?${buildFriendQuery()}`;
+        const res = await api<{ success: boolean; data: NflRookie[]; message?: string }>(endpoint);
+        subjects.value = Array.isArray(res.data) ? res.data : [];
+        if (res.success === false && subjects.value.length === 0) {
+            error.value = 'Andmeid ei laaditud.';
         }
     } catch (e) {
         error.value = e instanceof Error ? e.message : 'Failed to load';
@@ -315,7 +236,7 @@ async function removeSubject(s: NflRookie) {
                         <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                             <h1 class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">NFL'i rookied</h1>
                             <a
-                                :href="source === 'mine' ? '/api/rookies' : friendPublicApiUrl"
+                                :href="source === 'mine' ? '/api/nfl-rookies' : '/api/friend-favorite-subjects'"
                                 target="_blank"
                                 rel="noreferrer"
                                 class="text-sm font-medium text-violet-600 hover:underline dark:text-violet-400"
@@ -352,11 +273,8 @@ async function removeSubject(s: NflRookie) {
                                 <Users class="size-4 shrink-0" aria-hidden="true" />
                                 Sõbra filmid
                             </button>
-                            <code
-                                class="ml-1 inline-block max-w-full break-all rounded bg-neutral-200/80 px-2 py-0.5 text-left text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 sm:max-w-xl"
-                            >
-                                <template v-if="source === 'mine'">/api/rookies</template>
-                                <template v-else>{{ friendPublicApiUrl }}</template>
+                            <code class="ml-1 rounded bg-neutral-200/80 px-2 py-0.5 text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
+                                {{ activeApiPath }}
                             </code>
                         </div>
 
@@ -478,75 +396,66 @@ async function removeSubject(s: NflRookie) {
 
                     <div class="mt-5 space-y-8 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
                         <div>
+                            <p class="mb-2 font-semibold text-neutral-900 dark:text-neutral-50">Minu NFL API</p>
                             <p class="mb-2 rounded bg-sky-100 px-2 py-1 font-mono text-xs font-semibold text-sky-900 dark:bg-sky-950 dark:text-sky-100">
-                                GET /api/rookies
+                                GET /api/nfl-rookies
                             </p>
-                            <p class="mb-3">Tagastab kõik rookie'd. Toetab järgmisi parameetreid:</p>
-                            <div class="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-700">
-                                <table class="w-full min-w-[28rem] border-collapse text-left text-xs">
-                                    <thead class="bg-neutral-100 dark:bg-neutral-800/80">
-                                        <tr>
-                                            <th class="border-b border-neutral-200 px-3 py-2 font-semibold text-neutral-900 dark:border-neutral-700 dark:text-neutral-100">
-                                                Parameeter
-                                            </th>
-                                            <th class="border-b border-neutral-200 px-3 py-2 font-semibold text-neutral-900 dark:border-neutral-700 dark:text-neutral-100">
-                                                Kirjeldus
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="text-neutral-700 dark:text-neutral-300">
-                                        <tr class="border-b border-neutral-100 dark:border-neutral-800">
-                                            <td class="whitespace-nowrap px-3 py-2 font-mono text-[11px]">search</td>
-                                            <td class="px-3 py-2">otsing nime järgi</td>
-                                        </tr>
-                                        <tr class="border-b border-neutral-100 dark:border-neutral-800">
-                                            <td class="whitespace-nowrap px-3 py-2 font-mono text-[11px]">position</td>
-                                            <td class="px-3 py-2">
-                                                filtreeri positsiooni järgi (QB, RB, WR, TE, OT, DE, CB, S, ILB)
-                                            </td>
-                                        </tr>
-                                        <tr class="border-b border-neutral-100 dark:border-neutral-800">
-                                            <td class="whitespace-nowrap px-3 py-2 font-mono text-[11px]">team</td>
-                                            <td class="px-3 py-2">filtreeri meeskonna järgi</td>
-                                        </tr>
-                                        <tr class="border-b border-neutral-100 dark:border-neutral-800">
-                                            <td class="whitespace-nowrap px-3 py-2 font-mono text-[11px]">draft_round</td>
-                                            <td class="px-3 py-2">filtreeri drafti ringi järgi (1–7)</td>
-                                        </tr>
-                                        <tr class="border-b border-neutral-100 dark:border-neutral-800">
-                                            <td class="whitespace-nowrap px-3 py-2 font-mono text-[11px]">season_year</td>
-                                            <td class="px-3 py-2">filtreeri hooaja järgi</td>
-                                        </tr>
-                                        <tr class="border-b border-neutral-100 dark:border-neutral-800">
-                                            <td class="whitespace-nowrap px-3 py-2 font-mono text-[11px]">sort</td>
-                                            <td class="px-3 py-2">
-                                                sorteeri (title, rating, draft_round, season_year, created_at)
-                                            </td>
-                                        </tr>
-                                        <tr class="border-b border-neutral-100 dark:border-neutral-800">
-                                            <td class="whitespace-nowrap px-3 py-2 font-mono text-[11px]">direction</td>
-                                            <td class="px-3 py-2">suund (asc, desc)</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="whitespace-nowrap px-3 py-2 font-mono text-[11px]">limit</td>
-                                            <td class="px-3 py-2">piira tagastatavate kirjete arvu</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p class="mt-4 mb-2 rounded bg-sky-100 px-2 py-1 font-mono text-xs font-semibold text-sky-900 dark:bg-sky-950 dark:text-sky-100">
-                                GET /api/rookies/{id}
+                            <p class="mb-2">
+                                Tagastab rookied (<code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">success</code>,
+                                <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">count</code>,
+                                <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">data</code>). Parameetrid: <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">search</code>,
+                                <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">position</code> (alias <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">genre</code>),
+                                <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">team</code> (alias <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">director</code>),
+                                <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">year</code> (alias <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">season_year</code>),
+                                <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">sort</code> /
+                                <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">sort_by</code>,
+                                <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">direction</code>,
+                                <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">limit</code>.
                             </p>
-                            <p class="mb-6">Tagastab ühe rookie andmed.</p>
+                            <p class="mb-2 rounded bg-sky-100 px-2 py-1 font-mono text-xs font-semibold text-sky-900 dark:bg-sky-950 dark:text-sky-100">
+                                GET /api/nfl-rookies/{id}
+                            </p>
+                            <p>Tagastab ühe kirje (sh <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">rating</code>).</p>
+                        </div>
 
+                        <div>
+                            <p class="mb-2 font-semibold text-neutral-900 dark:text-neutral-50">Sõbra filmide API (õppe näidis)</p>
+                            <p class="mb-2 rounded bg-sky-100 px-2 py-1 font-mono text-xs font-semibold text-sky-900 dark:bg-sky-950 dark:text-sky-100">
+                                GET /api/movies
+                            </p>
+                            <p class="mb-2">Tagastab kõik filmid. Toetab järgmisi parameetreid:</p>
+                            <ul class="list-inside list-disc space-y-1 text-neutral-600 dark:text-neutral-400">
+                                <li><code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">search</code> — otsing pealkirja järgi</li>
+                                <li><code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">genre</code> — filtreeri žanri järgi</li>
+                                <li><code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">director</code> — filtreeri režissööri järgi</li>
+                                <li><code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">year</code> — filtreeri aasta järgi</li>
+                                <li>
+                                    <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">sort</code> — sorteeri (title, release_year, rating, created_at, director)
+                                </li>
+                                <li><code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">direction</code> — suund (asc, desc)</li>
+                                <li><code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">limit</code> — piira tagastatavate kirjete arvu</li>
+                            </ul>
+                            <p class="mb-2 mt-4 rounded bg-sky-100 px-2 py-1 font-mono text-xs font-semibold text-sky-900 dark:bg-sky-950 dark:text-sky-100">
+                                GET /api/movies/{id}
+                            </p>
+                            <p class="mb-2">Tagastab ühe filmi andmed.</p>
                             <p class="mb-2 rounded bg-sky-100 px-2 py-1 font-mono text-xs font-semibold text-sky-900 dark:bg-sky-950 dark:text-sky-100 break-all">
                                 GET {{ friendPublicApiUrl }}
                             </p>
-                            <p class="mb-6">Sõbra API — välise allikaga integratsioon.</p>
+                            <p class="mb-2">Sõbra API — välise allikaga integratsioon (samad filmiparameetrid; vastuses <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">data</code> ja <code class="rounded bg-neutral-100 px-1 dark:bg-neutral-800">meta</code>).</p>
+                            <p class="mb-2 rounded bg-sky-100 px-2 py-1 font-mono text-xs font-semibold text-sky-900 dark:bg-sky-950 dark:text-sky-100">
+                                GET /api/friend-favorite-subjects
+                            </p>
+                            <p class="mb-2">
+                                Meie rakenduse proxy ülalolevale sõbra URL-ile — sama päringusõnad mis filmide API-l; kaardid ühtlase formaadiga.
+                            </p>
+                            <p class="mb-2 font-semibold text-neutral-900 dark:text-neutral-100">Näidispäringud:</p>
+                            <pre class="overflow-x-auto rounded-lg bg-neutral-100 p-3 text-xs dark:bg-neutral-950"><code>GET /api/movies?search=batman&amp;sort=rating&amp;direction=desc&amp;limit=5
+GET /api/movies?genre=Action&amp;year=2024
 
-                            <p class="mb-2 font-semibold text-neutral-900 dark:text-neutral-50">Näidispäringud</p>
-                            <pre class="overflow-x-auto rounded-lg bg-neutral-100 p-3 text-xs dark:bg-neutral-950"><code>GET /api/rookies?search=mason&amp;sort=rating&amp;direction=desc&amp;limit=5
-GET /api/rookies?position=QB&amp;draft_round=1</code></pre>
+GET /api/nfl-rookies?search=Mason&amp;position=QB&amp;year=2026&amp;sort_by=created_at&amp;direction=desc
+
+GET /api/friend-favorite-subjects?search=matrix&amp;genre=Sci-Fi&amp;limit=5</code></pre>
                         </div>
                     </div>
                 </section>

@@ -7,9 +7,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/friend-favorite-subjects', FriendFavoriteSubjectsController::class);
 
-Route::get('/rookies', [NflRookieController::class, 'index']);
-Route::get('/rookies/{id}', [NflRookieController::class, 'show']);
-
 Route::get('/nfl-rookies', [NflRookieController::class, 'index']);
 Route::get('/nfl-rookies/{id}', [NflRookieController::class, 'show']);
 

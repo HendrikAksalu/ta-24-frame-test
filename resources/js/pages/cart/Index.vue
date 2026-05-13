@@ -17,8 +17,11 @@ const props = defineProps<{
 }>();
 
 function imageUrl(image: string | null) {
-    if (!image || !String(image).trim()) {
+    if (!image) {
         return '/img/veg/tomato.jpg';
+    }
+    if (image.startsWith('/')) {
+        return image;
     }
     const s = String(image).trim();
     if (s.startsWith('http://') || s.startsWith('https://')) {

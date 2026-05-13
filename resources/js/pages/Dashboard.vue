@@ -4,7 +4,7 @@ import { dashboard } from '@/routes';
 import type { AppPageProps, BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import FootballIcon from '@/components/icons/FootballIcon.vue';
-import { ArrowRight, CloudSun, Map, Newspaper, ShoppingCart } from 'lucide-vue-next';
+import { ArrowRight, CloudSun, CreditCard, Map, Newspaper, ShoppingCart } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -45,10 +45,17 @@ const modules = [
     },
     {
         title: 'E-pood',
-        description: 'Köögiviljad ostukorvis — vali tooted ja mine kassasse.',
+        description: 'Köögiviljad ostukorvis — maksmine Stripe hosted checkout kaudu.',
         href: '/shop',
         icon: ShoppingCart,
         iconBg: 'from-cyan-600 via-blue-700 to-slate-900',
+    },
+    {
+        title: 'Maksmine Stripe’iga',
+        description: 'Ava e-pood, mine kassasse ja tasuta Stripe kaardimaksevooga.',
+        href: '/shop',
+        icon: CreditCard,
+        iconBg: 'from-indigo-600 via-blue-700 to-slate-900',
     },
     {
         title: "NFL'i rookied",

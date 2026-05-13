@@ -19,21 +19,18 @@ class BlogController extends Controller
             ->latest()
             ->paginate(12);
 
+        $authors = [];
+        if ($request->user()) {
+            $authors = Author::query()
+                ->orderBy('last_name')
+                ->orderBy('first_name')
+                ->get(['id', 'first_name', 'last_name'])
+                ->mapWithKeys(fn (Author $a) => [$a->id => "{$a->first_name} {$a->last_name}"])
+                ->toArray();
+        }
+
         return Inertia::render('blog/Index', [
             'posts' => $posts,
-        ]);
-    }
-
-    public function create(Request $request): Response
-    {
-        $authors = Author::query()
-            ->orderBy('last_name')
-            ->orderBy('first_name')
-            ->get(['id', 'first_name', 'last_name'])
-            ->mapWithKeys(fn (Author $a) => [$a->id => "{$a->first_name} {$a->last_name}"])
-            ->toArray();
-
-        return Inertia::render('blog/Create', [
             'authors' => $authors,
         ]);
     }

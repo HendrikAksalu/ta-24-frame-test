@@ -25,10 +25,6 @@ Route::post('/blog/{post}/comments', [CommentController::class, 'store'])
     ->middleware('throttle:30,1')
     ->name('blog.comments.store');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::delete('/blog/{post}/comments/{comment}', [CommentController::class, 'destroy'])->name('blog.comments.destroy');
-});
-
 // Kaart: kõik näevad; lisamine/muutmine ainult sisse loginud (POST/PUT/DELETE allpool).
 Route::get('kaart', function () {
     return Inertia::render('Kaart');
@@ -38,9 +34,7 @@ Route::get('markers/{marker}', [MarkerController::class, 'show'])->name('markers
 
 // Blogisse postitamine: piisab auth-st (verified võib ülesande keskkonnas blokeerida).
 Route::middleware(['auth'])->group(function () {
-    Route::get('/blog-create', [BlogController::class, 'create'])->name('blog.create');
     Route::post('/blog', [BlogController::class, 'store'])->middleware('throttle:30,1')->name('blog.store');
-    Route::delete('/blog/{post}', [BlogController::class, 'destroy'])->name('blog.destroy');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -51,7 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('markers/{marker}', [MarkerController::class, 'destroy'])->name('markers.destroy');
 });
 
-// Shop / ostukorv / kassa (Stripe + PayPal demo)
+// Shop / ostukorv / kassa (Stripe hosted checkout)
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');

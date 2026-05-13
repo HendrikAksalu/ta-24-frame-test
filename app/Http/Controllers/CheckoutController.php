@@ -8,9 +8,6 @@ use App\Models\Product;
 use App\Support\CartSync;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Stripe\Checkout\Session as CheckoutSession;
@@ -30,107 +27,11 @@ class CheckoutController extends Controller
 
         return Inertia::render('checkout/Index', [
             'cart' => array_values($cart),
+            'stripeConfigured' => filled(config('services.stripe.secret')),
         ]);
     }
 
-    /**
-     * PayPal „turvaline“ voog arenduses: server teeb päris PayPal API külge mockitud kinnituse
-     * (sarnane K-Siim/RalfiHarjutus simulatsioonile). Kui PAYPAL_SIMULATE_FAILURE=true, näidatakse ebaõnnestumist
-     * ja ostukorv jääb alles.
-     *
-     * @see https://github.com/K-Siim/RalfiHarjutus
-     */
-    public function paypalCheckout(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'phone' => ['required', 'string', 'max:50'],
-        ]);
-
-        CartSync::refreshSessionCart();
-
-        $cart = session()->get('cart', []);
-
-        if ($cart === []) {
-            return redirect()->back()->withErrors(['payment' => 'Ostukorv on tühi.']);
-        }
-
-        if (config('services.paypal.simulate_failure')) {
-            return redirect()->back()->withErrors([
-                'payment' => 'PayPal simulatsioon: makse lükati tagasi (PAYPAL_SIMULATE_FAILURE). Ostukorv jäi alles.',
-            ]);
-        }
-
-        $total = collect($cart)->sum(fn ($item) => (float) $item['price'] * (int) $item['quantity']);
-
-        try {
-            $this->confirmPayPalSimulation($validated['email'], $total);
-        } catch (\Throwable $e) {
-            return redirect()->back()->withErrors([
-                'payment' => 'PayPal ühenduse viga: '.$e->getMessage(),
-            ]);
-        }
-
-        $paypalTransactionId = 'PP-'.strtoupper(Str::random(16));
-
-        $storesPaypalId = Schema::hasColumn('orders', 'paypal_transaction_id');
-
-        $order = DB::transaction(function () use ($validated, $cart, $total, $paypalTransactionId, $storesPaypalId) {
-            $attributes = [
-                'first_name' => $validated['first_name'],
-                'last_name' => $validated['last_name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'total' => $total,
-                'payment_status' => 'paid',
-                'payment_provider' => 'paypal',
-                'paid_at' => now(),
-            ];
-
-            if ($storesPaypalId) {
-                $attributes['paypal_transaction_id'] = $paypalTransactionId;
-            }
-
-            $order = Order::query()->create($attributes);
-
-            foreach ($cart as $item) {
-                OrderItem::query()->create([
-                    'order_id' => $order->id,
-                    'product_id' => $item['id'] ?? null,
-                    'product_name' => (string) ($item['name'] ?? 'Toode'),
-                    'price' => (float) ($item['price'] ?? 0),
-                    'quantity' => (int) ($item['quantity'] ?? 1),
-                ]);
-            }
-
-            return $order;
-        });
-
-        session()->forget('cart');
-
-        return redirect()->route('checkout.pay', ['order' => $order->id]);
-    }
-
-    /**
-     * Koht tootmise jaoks: siia tuleks OAuth + PayPal Orders/Capture REST kõned.
-     * Praegu tagastatakse kohe „approved“, et demonstreerida õnnestunud makseahelat.
-     */
-    private function confirmPayPalSimulation(string $email, float $total): void
-    {
-        // Placeholder päris API jaoks (sandbox: api-m.sandbox.paypal.com).
-        if ($total <= 0) {
-            throw new \InvalidArgumentException('Summa peab olema positiivne.');
-        }
-
-        $email = trim($email);
-        if ($email === '') {
-            throw new \InvalidArgumentException('E-post puudub.');
-        }
-    }
-
-    public function stripeCheckout(Request $request): RedirectResponse|Response
+    public function stripeCheckout(Request $request): RedirectResponse|\Illuminate\Http\Response
     {
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
@@ -275,8 +176,7 @@ class CheckoutController extends Controller
             ? collect()
             : Product::query()->whereIn('id', $productIds)->pluck('image', 'id');
 
-        $paymentId = $order->paypal_transaction_id
-            ?? $order->stripe_payment_intent_id
+        $paymentId = $order->stripe_payment_intent_id
             ?? $order->stripe_checkout_session_id
             ?? '—';
 
