@@ -37,10 +37,19 @@ const deleteComment = (commentId: number) => {
     if (!confirm('Kustuta see kommentaar?')) {
         return;
     }
-    router.delete(`/posts/${props.post.id}/comments/${commentId}`, {
+    router.delete(`/blog/${props.post.id}/comments/${commentId}`, {
         preserveScroll: true,
     });
 };
+
+function deletePost() {
+    if (!confirm('Kustuta see postitus koos kommentaaridega?')) {
+        return;
+    }
+    router.delete(`/blog/${props.post.id}`, {
+        preserveScroll: true,
+    });
+}
 </script>
 
 <template>

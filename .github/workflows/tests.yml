@@ -43,6 +43,13 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
+      # Wayfinder (npm prebuild) päringud vajavad sqlite faili ja migratsioone (.env.example kasutab sqlite).
+      - name: Prepare SQLite for Wayfinder
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+          php artisan migrate --force --no-interaction
+
       - name: Build Assets
         run: npm run build
 

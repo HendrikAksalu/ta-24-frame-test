@@ -68,6 +68,17 @@ const logoHref = computed(() => (page.props.auth?.user ? dashboard().url : '/'))
                 </template>
             </nav>
         </header>
+        <p
+            class="mb-6 flex w-full max-w-[335px] flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[13px] text-[#706f6c] lg:max-w-4xl dark:text-[#A1A09A]"
+        >
+            <Link href="/blog" class="font-medium hover:text-[#1b1b18] hover:underline dark:hover:text-[#EDEDEC]">Blogi</Link>
+            <span aria-hidden="true">·</span>
+            <Link href="/kaart" class="font-medium hover:text-[#1b1b18] hover:underline dark:hover:text-[#EDEDEC]">Kaart</Link>
+            <span aria-hidden="true">·</span>
+            <Link href="/shop" class="font-medium hover:text-[#1b1b18] hover:underline dark:hover:text-[#EDEDEC]">Pood</Link>
+            <span aria-hidden="true">·</span>
+            <Link href="/nfl-rookies" class="font-medium hover:text-[#1b1b18] hover:underline dark:hover:text-[#EDEDEC]">NFL rookied</Link>
+        </p>
         <div class="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0">
             <main class="flex w-full max-w-[335px] flex-col-reverse overflow-hidden rounded-lg lg:max-w-4xl lg:flex-row">
                 <div

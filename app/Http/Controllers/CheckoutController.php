@@ -117,6 +117,20 @@ class CheckoutController extends Controller
 
     public function success(Request $request): Response
     {
+        if ($request->filled('order')) {
+            $order = Order::query()
+                ->with('items')
+                ->findOrFail((int) $request->query('order'));
+
+            if ($order->payment_provider !== 'paypal' || $order->payment_status !== 'paid') {
+                abort(404);
+            }
+
+            return Inertia::render('checkout/Success', [
+                'order' => $this->orderPayload($order),
+            ]);
+        }
+
         $sessionId = $request->query('session_id');
         if (! is_string($sessionId) || $sessionId === '') {
             abort(404);

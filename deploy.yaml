@@ -11,23 +11,33 @@ hosts:
         http_user: virt137753
         remote_user: virt137753
         deploy_path: '~/domeenid/www.ta24aksalu.itmajakas.ee/ta24'
-        identity_file: '~/.ssh/id_ed25519'
+        # identity_file ära sea — GitHub Actions kasutab deployphp/action ssh-agentit;
+        # -i ~/.ssh/id_ed25519 jätab runneris võtmeta ja SSH nurjub.
         env:
             GIT_SSH_COMMAND: 'ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new'
 
 tasks:
     npm:production:
         - run: 'cd {{release_path}} && npm ci'
-        - run: 'cd {{release_path}} && npx vite build'
+        # npm run build käivitab prebuild → php artisan wayfinder:generate, siis vite build
+        - run: 'cd {{release_path}} && npm run build'
 
     opcache:clear:
         - run: killall php84-cgi || true
+
+    # Demo/PWA keskkond: blog+pood+NFL — prod näitab sama mis kohalik migrate --seed.
+    # NB: NflBlogReseedSeeder kustutab kõik postitused ja kommentaarid.
+    demo:seed:
+        - run: 'cd {{release_path}} && php artisan db:seed --class=NflBlogReseedSeeder --force'
+        - run: 'cd {{release_path}} && php artisan db:seed --class=ProductSeeder --force'
+        - run: 'cd {{release_path}} && php artisan db:seed --class=NflRookieSeeder --force'
 
     deploy:
         - 'deploy:prepare'
         - 'deploy:vendors'
         - 'npm:production'
         - 'artisan:migrate'
+        - 'demo:seed'
         - 'artisan:storage:link'
         - 'artisan:optimize:clear'
         - 'artisan:optimize'

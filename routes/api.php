@@ -11,6 +11,10 @@ Route::get('/nfl-rookies', [NflRookieController::class, 'index']);
 Route::get('/nfl-rookies/{id}', [NflRookieController::class, 'show']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/rookies', [NflRookieController::class, 'store']);
+    Route::put('/rookies/{id}', [NflRookieController::class, 'update']);
+    Route::delete('/rookies/{id}', [NflRookieController::class, 'destroy']);
+
     Route::post('/nfl-rookies', [NflRookieController::class, 'store']);
     Route::put('/nfl-rookies/{id}', [NflRookieController::class, 'update']);
     Route::delete('/nfl-rookies/{id}', [NflRookieController::class, 'destroy']);

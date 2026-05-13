@@ -62,4 +62,14 @@ class BlogController extends Controller
             'post' => $post->loadMissing('author', 'comments'),
         ]);
     }
+
+    public function destroy(Request $request, Post $post): RedirectResponse
+    {
+        abort_unless($request->user(), 403);
+
+        $post->comments()->delete();
+        $post->delete();
+
+        return redirect()->route('blog.index')->with('success', 'Postitus kustutatud.');
+    }
 }

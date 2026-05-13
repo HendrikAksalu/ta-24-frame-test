@@ -23,10 +23,14 @@ function imageUrl(image: string | null) {
     if (image.startsWith('/')) {
         return image;
     }
-    if (image.startsWith('http://') || image.startsWith('https://')) {
-        return image;
+    const s = String(image).trim();
+    if (s.startsWith('http://') || s.startsWith('https://')) {
+        return s;
     }
-    return image;
+    if (s.startsWith('/')) {
+        return s;
+    }
+    return `/${s.replace(/^\/+/, '')}`;
 }
 
 const total = computed(() => {

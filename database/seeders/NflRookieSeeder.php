@@ -96,6 +96,9 @@ class NflRookieSeeder extends Seeder
             ],
         ];
 
+        // Kustuta sama hooaja demo-read (sh korduva seed’i duplikaadid), seejärel täpselt need kirjed.
+        MyFavoriteSubject::query()->where('season_year', $seasonYear)->delete();
+
         foreach ($entries as $entry) {
             MyFavoriteSubject::query()->create($entry);
         }

@@ -2,6 +2,8 @@
     "private": true,
     "type": "module",
     "scripts": {
+        "wayfinder": "php artisan wayfinder:generate",
+        "prebuild": "php artisan wayfinder:generate",
         "build": "vite build",
         "build:sqlite": "DB_CONNECTION=sqlite vite build",
         "build:ssr": "vite build && vite build --ssr",

@@ -14,12 +14,13 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome');
-})->name('home');
+Route::redirect('/', '/dashboard', 302)->name('home');
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{post}', [BlogController::class, 'show'])->name('blog.show');
+
+// Varasem Laravel starter /posts voog → avalik NFL blogi (eemaldab inglisekeelse loendi/loomise UI).
+Route::redirect('/posts', '/blog', 302)->name('posts.index');
 Route::post('/blog/{post}/comments', [CommentController::class, 'store'])
     ->middleware('throttle:30,1')
     ->name('blog.comments.store');
@@ -53,6 +54,7 @@ Route::post('/cart/remove/{product}', [CartController::class, 'remove'])->name('
 Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/checkout/paypal', [CheckoutController::class, 'paypalCheckout'])->name('checkout.paypal');
 Route::post('/checkout/stripe', [CheckoutController::class, 'stripeCheckout'])->name('checkout.stripe');
 Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('/checkout/pay', [CheckoutController::class, 'success'])->name('checkout.pay');

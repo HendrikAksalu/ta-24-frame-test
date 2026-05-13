@@ -22,11 +22,6 @@ const mainNavItems: NavItem[] = [
         icon: BookOpen,
     },
     {
-        title: 'Posts',
-        href: '/posts',
-        icon: FileText,
-    },
-    {
         title: 'E-pood',
         href: '/shop',
         icon: LayoutGrid,

@@ -12,6 +12,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      # Kui siit „timed out“, ei jõua Deployer kunagi serverisse — tavaliselt tulemüür või vale host/port.
+      - name: Check SSH port (runner → server)
+        timeout-minutes: 2
+        run: |
+          if timeout 20 bash -c 'until printf "" >/dev/tcp/ta24aksalu.itmajakas.ee/22 2>/dev/null; do sleep 1; done'; then
+            echo "Port 22 on kättesaadav."
+          else
+            echo "::error::SSH port 22 ei ole GitHub Actions runnerist kättesaadav (timeout). Ava SSH välisõnnakutele või kasuta self-hosted runnerit võrgus, kus SSH on lubatud."
+            exit 1
+          fi
+
       - name: Deploy
         uses: deployphp/action@v1
         with:
