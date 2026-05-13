@@ -19,7 +19,6 @@ type NflRookie = {
 };
 
 const page = usePage();
-const user = computed(() => page.props.auth?.user);
 
 const csrfHeader = computed(() => {
     const fromProps = page.props.csrf_token;
@@ -151,92 +150,6 @@ function buildFriendQuery(): string {
     params.set('direction', direction.value);
     params.set('limit', String(limit.value));
     return params.toString();
-}
-
-function buildFriendQuery(): string {
-    const params = new URLSearchParams();
-    if (search.value.trim() !== '') {
-        params.set('search', search.value.trim());
-    }
-    if (genre.value !== 'Kõik') {
-        params.set('genre', genre.value);
-    }
-    params.set('sort', friendSortMap[sortField.value] ?? 'created_at');
-    params.set('direction', direction.value);
-    params.set('limit', String(limit.value));
-    return params.toString();
-}
-
-/** Sõbra avaliku API (`my-favorite-subjects`) rida → sama kaardivorming mis proxy normeeris */
-function normalizeFriendSubjectRow(row: Record<string, unknown>, idx: number): NflRookie {
-    const rawId = row.id;
-    const fid = rawId !== undefined && rawId !== null ? rawId : idx + 1;
-    const idStr = `friend-${fid}`;
-
-    const hasMovieShape = row.director !== undefined || row.release_year !== undefined;
-
-    if (hasMovieShape) {
-        const ratingRaw = row.rating;
-        let ratingNum: number | null = null;
-        if (typeof ratingRaw === 'number' && !Number.isNaN(ratingRaw)) {
-            ratingNum = ratingRaw;
-        } else if (typeof ratingRaw === 'string' && ratingRaw !== '' && !Number.isNaN(Number(ratingRaw))) {
-            ratingNum = Number(ratingRaw);
-        }
-
-        let ratingStr: string;
-        if (ratingNum !== null) {
-            ratingStr = ratingNum.toFixed(1);
-        } else if (ratingRaw !== undefined && ratingRaw !== null && String(ratingRaw) !== '') {
-            ratingStr = String(ratingRaw);
-        } else {
-            ratingStr = (7.4 + (idx % 6) * 0.15).toFixed(1);
-        }
-
-        const ry = row.release_year;
-        const seasonYearVal = typeof ry === 'number' ? ry : new Date().getFullYear();
-
-        const draftRound =
-            typeof row.draft_round === 'number'
-                ? row.draft_round
-                : ratingNum !== null
-                  ? Math.max(1, Math.min(7, Math.round(12 - ratingNum)))
-                  : 3;
-
-        return {
-            id: idStr,
-            title: String(row.title ?? ''),
-            team: String(row.director ?? ''),
-            position: String(row.genre ?? ''),
-            season_year: seasonYearVal,
-            draft_round: draftRound,
-            image: typeof row.image === 'string' ? row.image : null,
-            description: String(row.description ?? ''),
-            rating: ratingStr,
-        };
-    }
-
-    const draftRound = typeof row.draft_round === 'number' ? row.draft_round : 4;
-    const ratingRaw = row.rating;
-    let ratingStr: string;
-    if (ratingRaw !== undefined && ratingRaw !== null && String(ratingRaw) !== '') {
-        ratingStr = typeof ratingRaw === 'number' ? ratingRaw.toFixed(1) : String(ratingRaw);
-    } else {
-        ratingStr = Math.max(6.0, Math.min(9.9, 9.2 - (draftRound - 1) * 0.42)).toFixed(1);
-    }
-
-    const sy = row.season_year;
-    return {
-        id: idStr,
-        title: String(row.title ?? ''),
-        team: String(row.team ?? ''),
-        position: String(row.position ?? ''),
-        season_year: typeof sy === 'number' ? sy : new Date().getFullYear(),
-        draft_round: draftRound,
-        image: typeof row.image === 'string' ? row.image : null,
-        description: String(row.description ?? ''),
-        rating: ratingStr,
-    };
 }
 
 async function load() {

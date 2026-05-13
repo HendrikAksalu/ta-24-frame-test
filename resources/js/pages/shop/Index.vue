@@ -68,10 +68,6 @@ function imageUrl(image: string | null) {
 function priceNum(price: number | string) {
     return Number(price);
 }
-
-function priceNum(price: number | string) {
-    return Number(price);
-}
 </script>
 
 <template>

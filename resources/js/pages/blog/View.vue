@@ -42,14 +42,6 @@ const deleteComment = (commentId: number) => {
     });
 };
 
-function deletePost() {
-    if (!confirm('Kustuta see postitus koos kommentaaridega?')) {
-        return;
-    }
-    router.delete(`/blog/${props.post.id}`, {
-        preserveScroll: true,
-    });
-}
 </script>
 
 <template>
