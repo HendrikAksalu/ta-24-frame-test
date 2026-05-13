@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { login } from '@/routes';
-import { create } from '@/routes/posts';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
 import { computed, watch } from 'vue';
@@ -88,7 +87,7 @@ function submitCompose() {
                     </p>
                 </div>
                 <Button v-if="page.props.auth?.user" as-child class="shrink-0 gap-2">
-                    <Link :href="create().url">
+                    <Link :href="'/blog-create'">
                         <Plus class="size-4" />
                         Uus postitus
                     </Link>
