@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="480" viewBox="0 0 600 480" role="img" aria-label="`ampinjonid">
+  <defs>
+    <linearGradient id="mbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fafaf9"/>
+      <stop offset="100%" stop-color="#e7e5e4"/>
+    </linearGradient>
+    <linearGradient id="cap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fafafa"/>
+      <stop offset="100%" stop-color="#d6d3d1"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="480" fill="url(#mbg)"/>
+  <ellipse cx="220" cy="285" rx="95" ry="62" fill="url(#cap)" stroke="#57534e" stroke-width="3"/>
+  <rect x="195" y="285" width="50" height="95" rx="10" fill="#fafaf9" stroke="#57534e" stroke-width="3"/>
+  <ellipse cx="395" cy="305" rx="110" ry="70" fill="url(#cap)" stroke="#57534e" stroke-width="3"/>
+  <rect x="366" y="305" width="58" height="85" rx="11" fill="#fafaf9" stroke="#57534e" stroke-width="3"/>
+  <g fill="#78716c" opacity=".35">
+    <ellipse cx="195" cy="268" rx="12" ry="9"/><ellipse cx="245" cy="252" rx="14" ry="10"/><ellipse cx="370" cy="282" rx="13" ry="10"/><ellipse cx="425" cy="268" rx="11" ry="8"/></g>
+</svg>

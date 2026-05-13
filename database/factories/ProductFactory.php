@@ -10,19 +10,29 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ProductFactory extends Factory
 {
     /**
-     * Define the model's default state.
+     * Demo köögiviljad — ainult kohalikud /img/veg failid (ei kasuta Faker ladinateksti ega suuri hindu).
      *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
+        $rows = [
+            ['name' => 'Tomatid (250 g)', 'desc' => 'Mini-kasti tomatid salati kiirkorraks.', 'img' => '/img/veg/tomato.jpg'],
+            ['name' => 'Brokkoli (tükk)', 'desc' => 'Peakapsas lühikeseks küpsetusajaks.', 'img' => '/img/veg/broccoli.jpg'],
+            ['name' => 'Porgandid (500 g)', 'desc' => 'Krõmpsud juurviljad supile.', 'img' => '/img/veg/carrot.jpg'],
+            ['name' => 'Salatilehed', 'desc' => 'Segu kiireks lõunaks.', 'img' => '/img/veg/lettuce.svg'],
+            ['name' => 'Kurk', 'desc' => 'Krõbe kurk dipiga.', 'img' => '/img/veg/cucumber.svg'],
+        ];
+
+        $row = fake()->randomElement($rows);
+
         return [
-            'name' => $this->faker->words(3, true),
-            'description' => $this->faker->paragraph(),
-            'image' => 'https://placehold.co/600x400/png?text=' . urlencode($this->faker->words(2, true)),
-            'price' => $this->faker->randomFloat(2, 1, 1000),
-            'sku' => strtoupper($this->faker->unique()->bothify('SKU-#####')),
-            'stock_quantity' => $this->faker->numberBetween(0, 100),
+            'name' => $row['name'],
+            'description' => $row['desc'],
+            'image' => $row['img'],
+            'price' => fake()->randomFloat(2, 0.49, 3.99),
+            'sku' => 'FCT-'.fake()->unique()->numerify('######'),
+            'stock_quantity' => fake()->numberBetween(15, 80),
         ];
     }
 }

@@ -7,18 +7,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
-import { login as googleOAuth } from '@/routes/google';
 import { Form, Head } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 
 defineProps<{
     error?: string;
 }>();
+
+const inputClass =
+    'h-11 border-neutral-300 bg-white shadow-none transition-colors focus-visible:border-indigo-500 focus-visible:ring-indigo-500/25 dark:border-neutral-600 dark:bg-neutral-900';
 </script>
 
 <template>
-    <AuthBase title="Create an account" description="Enter your details below to create your account">
-        <Head title="Register" />
+    <AuthBase :show-header="false">
+        <Head title="Registreeri" />
 
         <Form
             v-bind="RegisteredUserController.store.form()"
@@ -30,27 +32,46 @@ defineProps<{
                 {{ error }}
             </div>
 
-            <div class="grid gap-6">
+            <div class="grid gap-5">
                 <div class="grid gap-2">
-                    <Label for="name">Name</Label>
-                    <Input id="name" type="text" required autofocus :tabindex="1" autocomplete="name" name="name" placeholder="Full name" />
+                    <Label for="name" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Nimi</Label>
+                    <Input
+                        id="name"
+                        type="text"
+                        required
+                        autofocus
+                        :tabindex="1"
+                        autocomplete="name"
+                        name="name"
+                        placeholder="Sinu nimi"
+                        :class="inputClass"
+                    />
                     <InputError :message="errors.name" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
-                    <Input id="email" type="email" required :tabindex="2" autocomplete="email" name="email" placeholder="email@example.com" />
+                    <Label for="email" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">E-post</Label>
+                    <Input id="email" type="email" required :tabindex="2" autocomplete="email" name="email" placeholder="sinu@epost.ee" :class="inputClass" />
                     <InputError :message="errors.email" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password">Password</Label>
-                    <Input id="password" type="password" required :tabindex="3" autocomplete="new-password" name="password" placeholder="Password" />
+                    <Label for="password" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Parool</Label>
+                    <Input
+                        id="password"
+                        type="password"
+                        required
+                        :tabindex="3"
+                        autocomplete="new-password"
+                        name="password"
+                        placeholder="••••••••"
+                        :class="inputClass"
+                    />
                     <InputError :message="errors.password" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password_confirmation">Confirm password</Label>
+                    <Label for="password_confirmation" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Kinnita parool</Label>
                     <Input
                         id="password_confirmation"
                         type="password"
@@ -58,25 +79,29 @@ defineProps<{
                         :tabindex="4"
                         autocomplete="new-password"
                         name="password_confirmation"
-                        placeholder="Confirm password"
+                        placeholder="••••••••"
+                        :class="inputClass"
                     />
                     <InputError :message="errors.password_confirmation" />
                 </div>
 
-                <Button type="submit" class="mt-2 w-full" tabindex="5" :disabled="processing">
-                    <LoaderCircle v-if="processing" class="h-4 w-4 animate-spin" />
-                    Create account
-                </Button>
-                <Button variant="secondary" as="a" :href="googleOAuth.url()" type="button" class="mt-2 w-full" tabindex="5" :disabled="processing">
-                    <LoaderCircle v-if="processing" class="h-4 w-4 animate-spin" />
-                    Sign in with Google
+                <Button
+                    type="submit"
+                    :tabindex="5"
+                    :disabled="processing"
+                    class="mt-1 h-11 w-full rounded-md bg-neutral-900 text-sm font-semibold uppercase tracking-wide text-white shadow-none hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+                >
+                    <LoaderCircle v-if="processing" class="size-4 animate-spin" />
+                    <span v-else>Registreeri</span>
                 </Button>
             </div>
 
-            <div class="text-center text-sm text-muted-foreground">
-                Already have an account?
-                <TextLink :href="login()" class="underline underline-offset-4" :tabindex="6">Log in</TextLink>
-            </div>
+            <p class="text-center text-sm text-neutral-500 dark:text-neutral-400">
+                Sul on juba konto?
+                <TextLink :href="login()" class="font-medium text-neutral-900 underline-offset-4 hover:underline dark:text-white" :tabindex="6">
+                    Logi sisse
+                </TextLink>
+            </p>
         </Form>
     </AuthBase>
 </template>

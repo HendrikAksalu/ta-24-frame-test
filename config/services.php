@@ -35,7 +35,7 @@ return [
         ],
     ],
     'weather' => [
-        'key' => env('WEATHER_API'),   
+        'key' => env('WEATHER_API'),
     ],
 
     'stripe' => [
@@ -44,9 +44,20 @@ return [
         'currency' => env('STRIPE_CURRENCY', 'eur'),
     ],
 
-    'google' => [    
-        'client_id' => env('GOOGLE_CLIENT_ID'),  
-        'client_secret' => env('GOOGLE_CLIENT_SECRET'),  
-        'redirect' => env('GOOGLE_REDIRECT_URI') 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
+    /*
+    | Sõbra avalik API (nt filmide demo) — päring proxy'takse läbi meie /api/friend-favorite-subjects,
+    | et vältida brauseri CORS piiranguid ja ühtlustada vastuse kuju NFL kaartide jaoks.
+    */
+    'friend_subjects' => [
+        'url' => env(
+            'FRIEND_SUBJECTS_API_URL',
+            'https://raamistikud.ta24armus.itmajakas.ee/api/my-favorite-subjects'
+        ),
     ],
 ];

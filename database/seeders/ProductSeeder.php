@@ -8,84 +8,88 @@ use Illuminate\Database\Seeder;
 class ProductSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Köögiviljad — fotod ja vektorgraafika ainult /public/img/veg (välis-CDN puudub).
      */
     public function run(): void
     {
         $products = [
             [
-                'name' => 'Running Shoes X1',
-                'description' => 'Lightweight running shoes for daily training and long walks.',
-                'image' => 'https://placehold.co/600x400/png?text=Running+Shoes+X1',
-                'price' => 89.90,
-                'sku' => 'SHOE-X1-001',
-                'stock_quantity' => 24,
+                'name' => 'Tomatid (500 g)',
+                'description' => 'Punased küpse külmikus hoitavad tomatid — sobib salati või pasteeti põhjaks.',
+                'image' => '/img/veg/tomato.jpg',
+                'price' => 1.99,
+                'sku' => 'VEG-TMT-500',
+                'stock_quantity' => 48,
             ],
             [
-                'name' => 'Hoodie Urban Grey',
-                'description' => 'Soft cotton hoodie with a relaxed fit and warm interior.',
-                'image' => 'https://placehold.co/600x400/png?text=Hoodie+Urban+Grey',
-                'price' => 49.90,
-                'sku' => 'HOOD-GREY-002',
-                'stock_quantity' => 31,
-            ],
-            [
-                'name' => 'Wireless Earbuds Pro',
-                'description' => 'Compact earbuds with clear sound and charging case.',
-                'image' => 'https://placehold.co/600x400/png?text=Wireless+Earbuds+Pro',
-                'price' => 79.00,
-                'sku' => 'AUDIO-PRO-003',
-                'stock_quantity' => 19,
-            ],
-            [
-                'name' => 'Smart Water Bottle',
-                'description' => 'Insulated bottle that keeps drinks cold and tracks daily intake.',
-                'image' => 'https://placehold.co/600x400/png?text=Smart+Water+Bottle',
-                'price' => 34.50,
-                'sku' => 'BOTTLE-SMART-004',
-                'stock_quantity' => 42,
-            ],
-            [
-                'name' => 'Backpack Travel 28L',
-                'description' => 'Durable backpack with laptop sleeve and hidden zipper pocket.',
-                'image' => 'https://placehold.co/600x400/png?text=Backpack+Travel+28L',
-                'price' => 64.90,
-                'sku' => 'PACK-TRAVEL-005',
-                'stock_quantity' => 15,
-            ],
-            [
-                'name' => 'Fitness Mat Comfort',
-                'description' => 'Non-slip exercise mat for stretching, yoga, and home workouts.',
-                'image' => 'https://placehold.co/600x400/png?text=Fitness+Mat+Comfort',
-                'price' => 29.90,
-                'sku' => 'MAT-COMFORT-006',
+                'name' => 'Brokkoli (1 tk)',
+                'description' => 'Roheline peakapsas — lühike küpsetusaeg säilitab krõmpsuva tekstuuri.',
+                'image' => '/img/veg/broccoli.jpg',
+                'price' => 1.49,
+                'sku' => 'VEG-BRK-001',
                 'stock_quantity' => 36,
             ],
             [
-                'name' => 'Desk Lamp Minimal',
-                'description' => 'Adjustable LED desk lamp with warm and cool light modes.',
-                'image' => 'https://placehold.co/600x400/png?text=Desk+Lamp+Minimal',
-                'price' => 39.90,
-                'sku' => 'LAMP-MIN-007',
-                'stock_quantity' => 22,
+                'name' => 'Salaatilehed mix (150 g)',
+                'description' => 'Mitme lehesordi segu — pestud; tarbi paari päeva jooksul.',
+                'image' => '/img/veg/lettuce.svg',
+                'price' => 1.79,
+                'sku' => 'VEG-SLT-MIX',
+                'stock_quantity' => 40,
             ],
             [
-                'name' => 'Mechanical Keyboard 87',
-                'description' => 'Compact keyboard with tactile switches and white backlight.',
-                'image' => 'https://placehold.co/600x400/png?text=Mechanical+Keyboard+87',
-                'price' => 99.00,
-                'sku' => 'KEYBOARD-87-008',
-                'stock_quantity' => 14,
+                'name' => 'Porgandid (1 kg)',
+                'description' => 'Oranž ja mahlane sort — hõõru koore või küpseta koos ürtidega.',
+                'image' => '/img/veg/carrot.jpg',
+                'price' => 1.09,
+                'sku' => 'VEG-PRG-1KG',
+                'stock_quantity' => 55,
             ],
             [
-                'name' => 'Portable SSD 1TB',
-                'description' => 'Fast external SSD for backups, media, and project files.',
-                'image' => 'https://placehold.co/600x400/png?text=Portable+SSD+1TB',
-                'price' => 119.00,
-                'sku' => 'SSD-1TB-009',
-                'stock_quantity' => 17,
+                'name' => 'Kurk (1 tk)',
+                'description' => 'Värskelt lõhnatu kurk viilude või marineerimise jaoks.',
+                'image' => '/img/veg/cucumber.svg',
+                'price' => 0.59,
+                'sku' => 'VEG-KRK-001',
+                'stock_quantity' => 72,
+            ],
+            [
+                'name' => 'Paprika punane (1 tk)',
+                'description' => 'Magusama maitsega paprika — hautised ja fajitad sõbralik valik.',
+                'image' => '/img/veg/pepper.svg',
+                'price' => 0.99,
+                'sku' => 'VEG-PPR-RED',
+                'stock_quantity' => 44,
+            ],
+            [
+                'name' => 'Kartul pestud (1,5 kg)',
+                'description' => 'Mitmeotstarbeline kartul ahju- või pudrutoitude jaoks.',
+                'image' => '/img/veg/potato.svg',
+                'price' => 1.49,
+                'sku' => 'VEG-KRT-15',
+                'stock_quantity' => 60,
+            ],
+            [
+                'name' => 'Sibul kollane (500 g)',
+                'description' => 'Klassikaline maitseaine — hoida kuivas ja ventileeritavas kohas.',
+                'image' => '/img/veg/onion.svg',
+                'price' => 0.79,
+                'sku' => 'VEG-SBL-500',
+                'stock_quantity' => 50,
+            ],
+            [
+                'name' => 'Šampinjonid (250 g)',
+                'description' => 'Hele kübaraga šampinjon — kuivalt pühkida enne praadimist.',
+                'image' => '/img/veg/mushroom.svg',
+                'price' => 1.99,
+                'sku' => 'VEG-SHP-250',
+                'stock_quantity' => 30,
             ],
         ];
+
+        $keepSkus = array_column($products, 'sku');
+
+        Product::query()->whereNotIn('sku', $keepSkus)->delete();
 
         foreach ($products as $product) {
             Product::query()->updateOrCreate(

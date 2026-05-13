@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -45,7 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('markers/{marker}', [MarkerController::class, 'destroy'])->name('markers.destroy');
 });
 
-// Shop / ostukorv / kassa (Stripe + PayPal demo)
+// Shop / ostukorv / kassa (Stripe hosted checkout)
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
@@ -54,7 +53,6 @@ Route::post('/cart/remove/{product}', [CartController::class, 'remove'])->name('
 Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/checkout/paypal', [CheckoutController::class, 'paypalCheckout'])->name('checkout.paypal');
 Route::post('/checkout/stripe', [CheckoutController::class, 'stripeCheckout'])->name('checkout.stripe');
 Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('/checkout/pay', [CheckoutController::class, 'success'])->name('checkout.pay');

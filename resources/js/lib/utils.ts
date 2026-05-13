@@ -7,7 +7,16 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function urlIsActive(urlToCheck: NonNullable<InertiaLinkProps['href']>, currentUrl: string) {
-    return toUrl(urlToCheck) === currentUrl;
+    const target = toUrl(urlToCheck);
+    if (!target) {
+        return false;
+    }
+    const currentPath = currentUrl.split('?')[0].split('#')[0];
+    const targetPath = target.split('?')[0].split('#')[0];
+    if (targetPath === '/') {
+        return currentPath === '/';
+    }
+    return currentPath === targetPath || currentPath.startsWith(`${targetPath}/`);
 }
 
 export function toUrl(href: NonNullable<InertiaLinkProps['href']>) {

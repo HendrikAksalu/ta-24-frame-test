@@ -9,8 +9,9 @@ use Illuminate\Database\Seeder;
 class PostSeeder extends Seeder
 {
     /**
-     * Curated published posts for the public /blog feed.
-     * Skips if there is already at least one published post (safe for production re-runs).
+     * NFL-teemalised avaldatud postitused blogisse.
+     * Kui avaldatud postitusi juba on, seeder jäetakse vahele (reaalse keskkonna ohutus).
+     * Uute näidiste jaoks: php artisan migrate:fresh --seed
      */
     public function run(): void
     {
@@ -20,59 +21,35 @@ class PostSeeder extends Seeder
 
         $authors = Author::query()->orderBy('id')->get();
         if ($authors->isEmpty()) {
-            $this->command?->warn('PostSeeder: no authors found. Run AuthorSeeder first.');
+            $this->command?->warn('PostSeeder: autorid puuduvad. Käivita enne AuthorSeeder.');
 
             return;
         }
 
         $entries = [
             [
-                'title' => 'Tere tulemast meie blogisse',
-                'description' => "See on näidispostitus, mis ilmub avalikus blogis (/blog).\n\nSiin saad kirjeldada projekti eesmärki, kasutatud tehnoloogiaid (Laravel, Inertia, Vue) ja linkida dokumentatsiooni.",
+                'title' => 'NFL draft: miks rookie hooaeg muudab tiimi dünaamikat?',
+                'description' => "Igal aastal täidavad esimese ringi valitud mängijad kohe nähtava rolli — eriti kui tiimil oli vaja QB või esiründeliini tugevdust.\n\nScoutide töö kombineerib kolledži tape'i, mõõtmisi ja intervjuusid; vigade hindamine tapab sageli ka väga õnnestunud draft'i.\n\nFantasy mängijatele on oluline jälgida training camp'i depth chart'e ja vigastuste uudiseid — need mõjutavad snap count'e kohe augustis.",
             ],
             [
-                'title' => 'Kuidas ilmateenust dashboardil kasutada',
-                'description' => "Töölaud kuvab OpenWeatherMapi andmeid valitud linna kohta.\n\nVaikimisi on Kuressaare; saad otsida teisi linnu välja kasti kaudu. Andmed on vahemälus, et API limiit ei kukuks liiga kiiresti täis.",
+                'title' => 'Red zone ja EPA: lihtsad mõisted fantasy jaoks',
+                'description' => "Red zone visiidid annavad TD tõenäosusest parema ettekujutuse kui ainult yard'id.\n\nEPA (expected points added) näitab, kas mänguloeng tõstis või vähendas tiimi võimalust punkte skoorida.\n\nKui vaatad Sunday tikkerit, tasub võrrelda QB pocket time'i ja WR separation'i — need kaks käivad sageli koos.",
             ],
             [
-                'title' => 'Kaardimarkerid ja OpenStreetMap',
-                'description' => "Markerid salvestatakse andmebaasi ja kuvatakse Leafleti kaardil.\n\nKlõpsa kaardil, et lisada uus punkt; paremal nimekirjas saad muuta või kustutada.",
+                'title' => 'Miks NFL kasutab otsustamiseks rohkem videot kui mõni teine liiga?',
+                'description' => "Challenge süsteem ja automaatne ülevaatus muutsid mängu tempo ja treenerite riskivalikut.\n\nMõned situatsioonid (nt runner'i progress) jäävad ikka kohtuniku human-error külge — see tekitab aastakümnetega polariseeruva arutelu.\n\nKui jälgid EM ajavööndis prime time'i, planeeri vähemalt kolme tunni aken — media timeout'id venitavad reaalajas kestvust.",
             ],
             [
-                'title' => 'Kommentaarid ja modereerimine',
-                'description' => "Avalik blogi võimaldab külalistel kommenteerida (nõutav on nimi).\n\nSisse loginud administraator (test@example.com) saab kommentaare kustutada.",
+                'title' => "Kaitseliini stunt'id ja sack'i eeldused",
+                'description' => "Nelja mehe rush'is tähendab stunt tihti seda, et DT pistab väliselt ja EDGE tuleb sisemaalt.\n\nQB timing sõltub drop sügavusest: kiire release vähendab sack riski, aga piirab sügavaid marsruute.\n\nKui vaatad defense snap count'e, näed sageli situatsioonilist rotation'i — short yardage pakub teistsugust personnel'i kui third-and-long.",
             ],
             [
-                'title' => 'Deploy ja migratsioonid',
-                'description' => "Tootmises käivitab Deployer tavaliselt `php artisan migrate`.\n\nKui blog on tühi, saad üks kord käivitada `php artisan db:seed` või ainult blogi sisu seederi.",
+                'title' => 'Special teams: miks field goal blokkid ei ole loterii',
+                'description' => "Kick block üksused töötavad release timing'u ja offensive line käte asetuse analüüsi najal.\n\nTuule ja müra mõju domeeni vs väliväljakul on märgatav ka statistikates.\n\nKohtunike uued taotlused timing penalty kohta panid mõned tiimid muutma oma cadence'i.",
             ],
             [
-                'title' => 'API võtmed ja .env',
-                'description' => "Ära commiti `.env` faili ega salajasi võtmeid.\n\nIlmateenuse jaoks kasuta `WEATHER_API` (OpenWeatherMap), Google OAuth jaoks vastavaid `GOOGLE_*` muutujaid.",
-            ],
-            [
-                'title' => 'Autorid ja postituste haldus',
-                'description' => "Sisse logides leiad jaotise Posts, kus saad luua mustandeid või avaldada tekste.\n\nAvalik blogi näitab ainult `published` linnukestega postitusi.",
-            ],
-            [
-                'title' => 'Turvalisus: CSRF ja throttle',
-                'description' => "Vormid kasutavad CSRF kaitset.\n\nAvaliku blogi kommentaaride teed kaitseb throttle, et vähendada rämpsposti riski.",
-            ],
-            [
-                'title' => 'Vue + Inertia: miks mitte klassikaline Blade?',
-                'description' => 'Inertia ühendab Laraveli marsruudid ja Vue komponendid ilma eralitava SPA API-ta, mida sa vajad ainult siis, kui ehitad mobiilirakendust või välist klienti.',
-            ],
-            [
-                'title' => 'Andmebaas: SQLite vs MySQL',
-                'description' => "Arenduses sobib SQLite kiiresti käima.\n\nTootmises on sageli MySQL/MariaDB; veendu, et migratsioonid on samad mõlemas keskkonnas.",
-            ],
-            [
-                'title' => 'Testkasutaja ja rollid',
-                'description' => "Seeder loob kasutaja test@example.com (parool vastavalt DatabaseSeederile).\n\nTulevikus tasub asendada päris rollipõhine õiguste süsteem (nt spatie/laravel-permission).",
-            ],
-            [
-                'title' => 'Järgmised sammud projektis',
-                'description' => "Võid täiendada e-poodi, makseid (Stripe), oma JSON API-d või lemmikteema tabelit.\n\nHoia commitid väikesed ja kirjeldused selged — see aitab hindajal aru saada.",
+                'title' => 'Konverentside tasakaal ja wildcard nädal',
+                'description' => "AFC ja NFC playoff joonised sõltuvad division võitudest — wildcard võib tuua rematch'e koheste rivaalide vahel.\n\nSeed'id määravad koduväljaku; üks nädal ei anna järgmist koduetappi automaatselt.\n\nBlogis võrdleme hooaja teisel poolel DVOA-laadseid võrdlusi lihtsate keskmiste yard'idega — keskmine võib eksitada.",
             ],
         ];
 

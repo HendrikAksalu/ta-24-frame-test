@@ -1,5 +1,6 @@
 import { InertiaLinkProps } from '@inertiajs/vue3';
 import type { LucideIcon } from 'lucide-vue-next';
+import type { Component } from 'vue';
 
 export interface Auth {
     user: User;
@@ -13,11 +14,12 @@ export interface BreadcrumbItem {
 export interface NavItem {
     title: string;
     href: NonNullable<InertiaLinkProps['href']>;
-    icon?: LucideIcon;
+    icon?: LucideIcon | Component;
     isActive?: boolean;
 }
 
 export type AppPageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+    csrf_token: string;
     name: string;
     quote: { message: string; author: string };
     auth: Auth;

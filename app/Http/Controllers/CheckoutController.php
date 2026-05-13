@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Support\CartSync;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 use Stripe\Checkout\Session as CheckoutSession;
@@ -14,20 +15,23 @@ use Stripe\Stripe as StripeApi;
 
 class CheckoutController extends Controller
 {
-    public function index(): Response
+    public function index(): Response|RedirectResponse
     {
+        CartSync::refreshSessionCart();
+
         $cart = session()->get('cart', []);
 
-        if (empty($cart)) {
+        if ($cart === []) {
             return redirect()->route('cart.index');
         }
 
         return Inertia::render('checkout/Index', [
             'cart' => array_values($cart),
+            'stripeConfigured' => filled(config('services.stripe.secret')),
         ]);
     }
 
-    public function stripeCheckout(Request $request)
+    public function stripeCheckout(Request $request): RedirectResponse|\Illuminate\Http\Response
     {
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
@@ -36,17 +40,19 @@ class CheckoutController extends Controller
             'phone' => ['required', 'string', 'max:50'],
         ]);
 
+        CartSync::refreshSessionCart();
+
         $cart = session()->get('cart', []);
 
-        if (empty($cart)) {
-            return redirect()->back()->with('error', 'Ostukorv on tühi.');
+        if ($cart === []) {
+            return redirect()->back()->withErrors(['payment' => 'Ostukorv on tühi.']);
         }
 
         $stripeSecret = config('services.stripe.secret');
         $currency = config('services.stripe.currency', 'eur');
 
-        if (!is_string($stripeSecret) || $stripeSecret === '') {
-            return redirect()->back()->with('error', 'Stripe pole seadistatud (puudub STRIPE_SECRET_KEY).');
+        if (! is_string($stripeSecret) || $stripeSecret === '') {
+            return redirect()->back()->withErrors(['payment' => 'Stripe pole seadistatud (puudub STRIPE_SECRET_KEY).']);
         }
 
         $total = collect($cart)->sum(function ($item) {
@@ -94,7 +100,7 @@ class CheckoutController extends Controller
             'mode' => 'payment',
             'payment_method_types' => ['card'],
             'line_items' => $lineItems,
-            'success_url' => route('checkout.success') . '?session_id={CHECKOUT_SESSION_ID}',
+            'success_url' => url('/checkout/pay').'?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('checkout.cancel'),
             'client_reference_id' => (string) $order->id,
             'metadata' => [
@@ -112,7 +118,7 @@ class CheckoutController extends Controller
     public function success(Request $request): Response
     {
         $sessionId = $request->query('session_id');
-        if (!is_string($sessionId) || $sessionId === '') {
+        if (! is_string($sessionId) || $sessionId === '') {
             abort(404);
         }
 
@@ -121,7 +127,6 @@ class CheckoutController extends Controller
             ->with('items')
             ->firstOrFail();
 
-        // Try to sync status from Stripe; if Stripe keys are not set, rely on DB value.
         $stripeSecret = config('services.stripe.secret');
         if (is_string($stripeSecret) && $stripeSecret !== '' && $order->payment_status !== 'paid') {
             try {
@@ -144,19 +149,41 @@ class CheckoutController extends Controller
         }
 
         return Inertia::render('checkout/Success', [
-            'order' => [
-                'id' => $order->id,
-                'order_number' => 'ORD-' . str_pad((string) $order->id, 6, '0', STR_PAD_LEFT),
-                'total' => (string) $order->total,
-                'payment_status' => $order->fresh()->payment_status,
-                'paid_at' => $order->paid_at?->toISOString(),
-                'items' => $order->items->map(fn ($i) => [
-                    'product_name' => $i->product_name,
-                    'price' => (string) $i->price,
-                    'quantity' => (int) $i->quantity,
-                ])->values(),
-            ],
+            'order' => $this->orderPayload($order->fresh(['items'])),
         ]);
+    }
+
+    private function orderPayload(Order $order): array
+    {
+        $order->loadMissing('items');
+
+        $productIds = $order->items->pluck('product_id')->filter()->unique()->values();
+        $images = $productIds->isEmpty()
+            ? collect()
+            : Product::query()->whereIn('id', $productIds)->pluck('image', 'id');
+
+        $paymentId = $order->stripe_payment_intent_id
+            ?? $order->stripe_checkout_session_id
+            ?? '—';
+
+        return [
+            'id' => $order->id,
+            'order_number' => 'ORD-'.str_pad((string) $order->id, 6, '0', STR_PAD_LEFT),
+            'order_short' => '#'.$order->id,
+            'first_name' => $order->first_name,
+            'email' => $order->email,
+            'total' => (string) $order->total,
+            'payment_status' => $order->payment_status,
+            'payment_provider' => $order->payment_provider,
+            'payment_id' => $paymentId,
+            'paid_at' => $order->paid_at?->toISOString(),
+            'items' => $order->items->map(fn ($i) => [
+                'product_name' => $i->product_name,
+                'price' => (string) $i->price,
+                'quantity' => (int) $i->quantity,
+                'image' => $i->product_id ? ($images[$i->product_id] ?? null) : null,
+            ])->values(),
+        ];
     }
 
     public function cancel(): Response
@@ -164,4 +191,3 @@ class CheckoutController extends Controller
         return Inertia::render('checkout/Cancel');
     }
 }
-

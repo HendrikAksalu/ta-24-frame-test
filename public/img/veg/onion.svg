@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="480" viewBox="0 0 600 480" role="img" aria-label="Sibul">
+  <defs>
+    <linearGradient id="obg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff7ed"/>
+      <stop offset="100%" stop-color="#ffedd5"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="480" fill="url(#obg)"/>
+  <ellipse cx="305" cy="270" rx="140" ry="115" fill="#fef08a" stroke="#ca8a04" stroke-width="4"/>
+  <ellipse cx="305" cy="265" rx="108" ry="88" fill="#fde047" stroke="#ca8a04" stroke-width="3" opacity=".85"/>
+  <ellipse cx="305" cy="258" rx="78" ry="62" fill="#fef9c3" stroke="#ca8a04" stroke-width="2.5" opacity=".9"/>
+  <path d="M305 118 Q285 70 305 40 Q325 70 305 118Z" fill="#86efac" stroke="#15803d" stroke-width="3"/>
+</svg>

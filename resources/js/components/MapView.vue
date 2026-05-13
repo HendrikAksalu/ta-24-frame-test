@@ -5,7 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import Dialog from './ui/dialog/Dialog.vue';
 import DialogContent from './ui/dialog/DialogContent.vue';
 import DialogDescription from './ui/dialog/DialogDescription.vue';
@@ -36,13 +37,22 @@ const editingMarker = ref<ApiMarker | null>(null);
 const createForm = ref({ name: '', description: '' });
 const editForm = ref({ name: '', description: '', latitude: 0, longitude: 0 });
 
+const page = usePage();
+/** Avalik vaade: markerid laadivad; lisamine/muutmine ainult sisse loginud */
+const canEditMarkers = computed(() => Boolean(page.props.auth?.user));
+
 let map: L.Map | null = null;
 let markersLayer: L.LayerGroup | null = null;
 let suppressNextMapClick = false;
 
-function csrf(): string {
+/** Meta token on first paint; prop updates on every Inertia visit (avoids stale token after login/regenerate). */
+const csrfHeader = computed(() => {
+    const fromProps = page.props.csrf_token;
+    if (typeof fromProps === 'string' && fromProps.length > 0) {
+        return fromProps;
+    }
     return document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '';
-}
+});
 
 function formatApiError(data: Record<string, unknown>): string {
     if (typeof data.message === 'string') {
@@ -60,7 +70,7 @@ function formatApiError(data: Record<string, unknown>): string {
 async function api<T>(url: string, options: RequestInit = {}): Promise<T> {
     const headers: Record<string, string> = {
         Accept: 'application/json',
-        'X-CSRF-TOKEN': csrf(),
+        'X-CSRF-TOKEN': csrfHeader.value,
         'X-Requested-With': 'XMLHttpRequest',
         ...(options.headers as Record<string, string>),
     };
@@ -106,7 +116,11 @@ function renderMarkers() {
         cm.bindPopup(`<strong>${safeName}</strong><br/>${safeDesc}`);
         cm.on('click', () => {
             suppressNextMapClick = true;
-            openEdit(m);
+            if (canEditMarkers.value) {
+                openEdit(m);
+            } else {
+                cm.openPopup();
+            }
             setTimeout(() => {
                 suppressNextMapClick = false;
             }, 100);
@@ -121,6 +135,9 @@ function renderMarkers() {
 
 function onMapClick(e: L.LeafletMouseEvent) {
     if (suppressNextMapClick) {
+        return;
+    }
+    if (!canEditMarkers.value) {
         return;
     }
     createLatLng.value = { lat: e.latlng.lat, lng: e.latlng.lng };
@@ -246,7 +263,8 @@ onBeforeUnmount(() => {
             class="flex w-full flex-col rounded-lg border border-sidebar-border/70 bg-card p-4 md:w-72 dark:border-sidebar-border"
         >
             <h3 class="mb-2 text-sm font-semibold">Markerid</h3>
-            <p class="mb-3 text-xs text-muted-foreground">Klõpsa kaardil, et lisada uus koht.</p>
+            <p v-if="canEditMarkers" class="mb-3 text-xs text-muted-foreground">Klõpsa kaardil, et lisada uus koht.</p>
+            <p v-else class="mb-3 text-xs text-muted-foreground">Logi sisse, et lisada või muuta markereid. Markeritel klõpsates näed nime ja kirjeldust.</p>
             <p v-if="loadError" class="mb-2 text-xs text-destructive">{{ loadError }}</p>
             <ul class="max-h-64 space-y-2 overflow-y-auto text-sm md:max-h-none md:flex-1">
                 <li v-if="!markers.length && !loadError" class="text-muted-foreground">Ühtegi markerit pole.</li>
@@ -256,10 +274,13 @@ onBeforeUnmount(() => {
                     class="rounded-md border border-border/80 p-2 transition hover:bg-muted/40"
                 >
                     <div class="font-medium">{{ m.name }}</div>
-                    <div class="text-xs text-muted-foreground">
+                    <p class="mt-1 text-xs leading-snug text-muted-foreground">
+                        {{ m.description?.trim() ? m.description : 'Kirjeldus puudub.' }}
+                    </p>
+                    <div class="mt-1 text-xs text-muted-foreground">
                         {{ m.latitude.toFixed(5) }}, {{ m.longitude.toFixed(5) }}
                     </div>
-                    <div class="mt-2 flex gap-2">
+                    <div v-if="canEditMarkers" class="mt-2 flex gap-2">
                         <Button type="button" variant="secondary" size="sm" class="h-7 text-xs" @click="openEdit(m)">Muuda</Button>
                         <Button type="button" variant="destructive" size="sm" class="h-7 text-xs" @click="removeMarker(m)">Kustuta</Button>
                     </div>

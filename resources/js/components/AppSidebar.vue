@@ -6,6 +6,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
+import FootballIcon from '@/components/icons/FootballIcon.vue';
 import { BookOpen, FileText, Folder, LayoutGrid } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
@@ -16,7 +17,7 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Blogi (avalik)',
+        title: 'Blogi',
         href: '/blog',
         icon: BookOpen,
     },
@@ -31,9 +32,9 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'NFL rookied',
+        title: "NFL'i rookied",
         href: '/nfl-rookies',
-        icon: FileText,
+        icon: FootballIcon,
     },
 ];
 
